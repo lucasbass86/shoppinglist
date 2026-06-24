@@ -13,6 +13,7 @@ import 'package:shoppinglist/secret/secret.dart';
 export 'package:shoppinglist/utils/extensions.dart';
 
 class Utils {
+  // NUEVA MODIFICACION
   static String urlUpdatePath = Secret.urlUpdatePath;
   static Directory path = Directory('');
   static const int productImageSizeStandar = 70;
