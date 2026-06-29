@@ -194,8 +194,15 @@ class _HistoryDetailPageState extends State<HistoryDetailPage> {
                                                     height: 30),
                                                 const SizedBox(width: 10),
                                                 Expanded(
-                                                    child: Text(group[index].product.name,
-                                                        style: mainProvider.itemStyle)),
+                                                  child: MarqueeWidget(
+                                                    child: Text(
+                                                        group[index].product.name +
+                                                            (group[index].product.details.isNotEmpty
+                                                                ? ' (${group[index].product.details})'
+                                                                : ''),
+                                                        style: mainProvider.itemStyle),
+                                                  ),
+                                                ),
                                                 Row(
                                                   children: [
                                                     Text('${group[index].quantity} x ',

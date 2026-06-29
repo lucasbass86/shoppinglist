@@ -86,7 +86,7 @@ class _UserPageState extends State<UserPage> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Utils.medio,
+                color: Utils.claro,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Column(
@@ -273,7 +273,7 @@ class _UserPageState extends State<UserPage> {
             width: 140,
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Utils.claro,
+              color: Utils.medio,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
@@ -283,7 +283,7 @@ class _UserPageState extends State<UserPage> {
                 Icon(
                   Icons.backup_sharp,
                   size: Utils.iconSizeStandar,
-                  color: Utils.medio,
+                  color: Utils.oscuro,
                 ),
               ],
             ),
@@ -334,7 +334,7 @@ class _UserPageState extends State<UserPage> {
             width: 140,
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Utils.claro,
+              color: Utils.medio,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
@@ -344,7 +344,7 @@ class _UserPageState extends State<UserPage> {
                 Icon(
                   Icons.restore,
                   size: Utils.iconSizeStandar,
-                  color: Utils.medio,
+                  color: Utils.oscuro,
                 ),
               ],
             ),
@@ -364,9 +364,9 @@ class _UserPageState extends State<UserPage> {
             Text('Datos Locales', style: mainProvider.titleStyle.copyWith(fontSize: 25)),
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Utils.medio,
+                color: Utils.claro,
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Row(
@@ -415,7 +415,7 @@ class _UserPageState extends State<UserPage> {
             width: 140,
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Utils.claro,
+              color: Utils.medio,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
@@ -425,7 +425,7 @@ class _UserPageState extends State<UserPage> {
                 Icon(
                   Icons.save_alt_rounded,
                   size: Utils.iconSizeStandar,
-                  color: Utils.medio,
+                  color: Utils.oscuro,
                 ),
               ],
             ),
@@ -467,7 +467,7 @@ class _UserPageState extends State<UserPage> {
             width: 140,
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: Utils.claro,
+              color: Utils.medio,
               borderRadius: BorderRadius.circular(20),
             ),
             child: Column(
@@ -477,7 +477,7 @@ class _UserPageState extends State<UserPage> {
                 Icon(
                   Icons.restart_alt_rounded,
                   size: Utils.iconSizeStandar,
-                  color: Utils.medio,
+                  color: Utils.oscuro,
                 ),
               ],
             ),

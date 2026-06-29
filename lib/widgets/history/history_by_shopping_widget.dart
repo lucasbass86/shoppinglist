@@ -78,7 +78,11 @@ class HistoryByShoppingWidget extends StatelessWidget {
                           const SizedBox(width: 7),
                           Expanded(
                             child: MarqueeWidget(
-                                child: Text(shoppingHistory[index].product.name,
+                                child: Text(
+                                    shoppingHistory[index].product.name +
+                                        (shoppingHistory[index].product.details.isNotEmpty
+                                            ? ' (${shoppingHistory[index].product.details})'
+                                            : ''),
                                     style: mainProvider.itemStyle)),
                           ),
                           Text('${shoppingHistory[index].quantity}x',

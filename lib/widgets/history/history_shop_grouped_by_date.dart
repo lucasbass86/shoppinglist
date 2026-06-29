@@ -119,26 +119,39 @@ class _HistoryShopGroupedByDateState extends State<HistoryShopGroupedByDate> {
                     double newPrice =
                         mainProvider.getProductPrice(line, widget.shoppingHistory[0].shop);
                     double totalLine = e.value * newPrice;
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 3),
-                      child: Row(
-                        children: [
-                          Image(image: line.imageType.image(), width: 20, height: 20),
-                          const SizedBox(width: 7),
-                          Expanded(
-                            child: MarqueeWidget(
-                                child: Text(line.name, style: mainProvider.itemStyle)),
+                    return Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        splashColor: Utils.oscuro,
+                        borderRadius: BorderRadius.circular(20),
+                        onTap: () =>
+                            Navigator.pushNamed(context, ProductPage.routeName, arguments: line),
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 3),
+                          child: Row(
+                            children: [
+                              Image(image: line.imageType.image(), width: 20, height: 20),
+                              const SizedBox(width: 7),
+                              Expanded(
+                                child: MarqueeWidget(
+                                    child: Text(
+                                        line.name +
+                                            (line.details.isNotEmpty ? ' (${line.details})' : ''),
+                                        style: mainProvider.itemStyle)),
+                              ),
+                              Text('${e.value}x', style: mainProvider.itemStyle),
+                              Text("${newPrice.toStringAsFixed(2)}=",
+                                  style: mainProvider.itemStyle),
+                              Text(
+                                '${totalLine.toStringAsFixed(2)}€',
+                                style: mainProvider.itemStyle.copyWith(
+                                    color: totalLine == 0
+                                        ? Colors.red[800]!.withAlpha(175)
+                                        : Utils.oscuro),
+                              ),
+                            ],
                           ),
-                          Text('${e.value}x', style: mainProvider.itemStyle),
-                          Text("${newPrice.toStringAsFixed(2)}=", style: mainProvider.itemStyle),
-                          Text(
-                            '${totalLine.toStringAsFixed(2)}€',
-                            style: mainProvider.itemStyle.copyWith(
-                                color: totalLine == 0
-                                    ? Colors.red[800]!.withAlpha(175)
-                                    : Utils.oscuro),
-                          ),
-                        ],
+                        ),
                       ),
                     );
                   },

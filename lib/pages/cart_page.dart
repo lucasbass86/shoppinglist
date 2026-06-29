@@ -431,7 +431,11 @@ class _CartPageState extends State<CartPage> with SingleTickerProviderStateMixin
                                 child: SingleChildScrollView(
                                   physics: const BouncingScrollPhysics(),
                                   scrollDirection: Axis.horizontal,
-                                  child: Text(cart.products[index].product.name,
+                                  child: Text(
+                                      cart.products[index].product.name +
+                                          (cart.products[index].product.details.isNotEmpty
+                                              ? ' (${cart.products[index].product.details})'
+                                              : ''),
                                       style: mainProvider.itemStyle),
                                 ),
                               ),
