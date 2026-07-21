@@ -61,7 +61,7 @@ class _CartMiniWidgetState extends State<CartMiniWidget> with TickerProviderStat
       child: GestureDetector(
         onLongPress: () => Navigator.pushNamed(context, ProductPage.routeName,
             arguments: widget.cartProduct.product),
-        onTap: () {
+        onDoubleTap: () {
           late ShoppingHistory shoppingHistory;
           _checkController.forward().then((onValue) => _checkController.reset()).then((_) async {
             shoppingHistory = await mainProvider.addShoppingHistory(widget.cartProduct.product,

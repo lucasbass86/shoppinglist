@@ -410,7 +410,7 @@ extension EImageTypeToString on EImageType {
       case EImageType.encurtidos:
         return 'Encurtido';
       case EImageType.especias:
-        return 'Espepcia';
+        return 'Especias';
       case EImageType.fresa:
         return 'Fresa';
       case EImageType.fruta:

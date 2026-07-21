@@ -152,6 +152,12 @@ class MainProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  bool get groupCart => Preferences.groupCart;
+  set groupCart(bool value) {
+    Preferences.groupCart = value;
+    notifyListeners();
+  }
+
   bool get avisoBarato => Preferences.avisoBarato;
   set avisoBarato(bool value) {
     Preferences.avisoBarato = value;

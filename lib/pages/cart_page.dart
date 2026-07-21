@@ -73,7 +73,8 @@ class _CartPageState extends State<CartPage> with SingleTickerProviderStateMixin
                   showCart: false,
                   title: 'Carrito',
                   showExit: true,
-                  showForecast: true),
+                  showForecast: true,
+                  showGroupCart: true),
               if (mainProvider.cart.isNotEmpty) shopsNames(),
               if (mainProvider.cart.isNotEmpty) paginadero(),
               if (mainProvider.cart.isEmpty) noProducts(context),
@@ -325,30 +326,96 @@ class _CartPageState extends State<CartPage> with SingleTickerProviderStateMixin
             crossAxisSpacing: 20,
             mainAxisSpacing: 20,
           );
-    productos = GridView.builder(
-      physics: const BouncingScrollPhysics(),
-      controller: scrollController,
-      keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
-      gridDelegate: delegate,
-      itemCount: cart.products.length,
-      itemBuilder: (_, index) {
-        return CartMiniWidget(
-          cart: cart,
-          cartProduct: cart.products[index],
-          onMove: (move) => setState(() => showNewShop = move),
-          onCheck: (history) {
-            if (Preferences.deshacer) {
-              _onCheckItem(context, cart.shop, cart.products[index], history);
-            }
-          },
-          onDelete: (quantity) {
-            if (Preferences.deshacer) {
-              _onDeleteItem(context, cart.shop, cart.products[index], quantity);
-            }
-          },
-        );
-      },
-    );
+    if (mainProvider.groupCart) {
+      List<EImageType> types = cart.products.map((p) => p.product.imageType).toSet().toList()
+        ..sort((a, b) => a.displayName().compareTo(b.displayName()));
+      productos = Padding(
+        padding: const EdgeInsets.only(left: 8, top: 8, right: 8, bottom: 8),
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            spacing: 10,
+            children: [
+              ...types.map(
+                (t) {
+                  List<CartProduct> products =
+                      cart.products.where((p) => p.product.imageType == t).toList();
+                  return Column(
+                    spacing: 10,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            t.displayName(),
+                            style: mainProvider.minititleStyle.copyWith(color: Utils.claro),
+                          ),
+                          Text(
+                            products.length.toString(),
+                            style: mainProvider.minititleStyle.copyWith(color: Utils.oscuro),
+                          ),
+                        ],
+                      ),
+                      GridView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        shrinkWrap: true,
+                        controller: scrollController,
+                        gridDelegate: delegate,
+                        itemCount: products.length,
+                        itemBuilder: (_, index) {
+                          return CartMiniWidget(
+                            cart: cart,
+                            cartProduct: products[index],
+                            onMove: (move) => setState(() => showNewShop = move),
+                            onCheck: (history) {
+                              if (Preferences.deshacer) {
+                                _onCheckItem(context, cart.shop, products[index], history);
+                              }
+                            },
+                            onDelete: (quantity) {
+                              if (Preferences.deshacer) {
+                                _onDeleteItem(context, cart.shop, products[index], quantity);
+                              }
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  );
+                },
+              )
+            ],
+          ),
+        ),
+      );
+    } else {
+      productos = GridView.builder(
+        physics: const BouncingScrollPhysics(),
+        controller: scrollController,
+        keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+        gridDelegate: delegate,
+        itemCount: cart.products.length,
+        itemBuilder: (_, index) {
+          return CartMiniWidget(
+            cart: cart,
+            cartProduct: cart.products[index],
+            onMove: (move) => setState(() => showNewShop = move),
+            onCheck: (history) {
+              if (Preferences.deshacer) {
+                _onCheckItem(context, cart.shop, cart.products[index], history);
+              }
+            },
+            onDelete: (quantity) {
+              if (Preferences.deshacer) {
+                _onDeleteItem(context, cart.shop, cart.products[index], quantity);
+              }
+            },
+          );
+        },
+      );
+    }
 
     return Stack(
       children: [
@@ -382,114 +449,143 @@ class _CartPageState extends State<CartPage> with SingleTickerProviderStateMixin
   }
 
   void _bottomInfo(Cart cart) {
+    List<String> orders = ['Nombre', 'Tipo'];
+    String selOrder = 'Nombre';
     showModalBottomSheet(
       context: context,
       builder: (context) {
         return GestureDetector(
           onTap: () => Navigator.pop(context),
-          child: Container(
-            padding: const EdgeInsets.only(bottom: 10, left: 15, top: 10, right: 15),
-            decoration: BoxDecoration(
-              color: Utils.claro,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-              children: [
-                Text('Listado de ${cart.shop.name}', style: mainProvider.itemStyle),
-                const SizedBox(height: 16),
-                Expanded(
-                  child: ListView.separated(
-                    separatorBuilder: (context, index) => ZoomIn(
-                      delay: Duration(milliseconds: 100 * index),
-                      child: Divider(color: Utils.oscuro, thickness: 1),
-                    ),
-                    physics: const BouncingScrollPhysics(),
-                    itemCount: cart.products.length,
-                    itemBuilder: (context, index) {
-                      double precio = mainProvider.productsShops
-                          .firstWhere(
-                              (p) =>
-                                  p.product.id == cart.products[index].product.id &&
-                                  p.shop.id == cart.shop.id,
-                              orElse: () => ProductShop(
-                                  0, cart.products[index].product, cart.shop, 0, DateTime.now()))
-                          .price;
-                      double total = precio * cart.products[index].quantity;
-                      return ZoomIn(
-                        delay: Duration(milliseconds: 100 * index),
-                        child: Container(
-                          margin: const EdgeInsets.only(bottom: 5),
-                          child: Row(
-                            children: [
-                              Image(
-                                  image: cart.products[index].product.imageType.image(),
-                                  width: 30,
-                                  height: 30),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                flex: 4,
-                                child: SingleChildScrollView(
-                                  physics: const BouncingScrollPhysics(),
-                                  scrollDirection: Axis.horizontal,
-                                  child: Text(
-                                      cart.products[index].product.name +
-                                          (cart.products[index].product.details.isNotEmpty
-                                              ? ' (${cart.products[index].product.details})'
-                                              : ''),
-                                      style: mainProvider.itemStyle),
-                                ),
-                              ),
-                              Expanded(
-                                flex: 3,
-                                child: SingleChildScrollView(
-                                  physics: const BouncingScrollPhysics(),
-                                  scrollDirection: Axis.horizontal,
-                                  child: Row(
-                                    children: [
-                                      Text(
-                                          '${cart.products[index].quantity} x ${precio.toStringAsFixed(2)} = ',
-                                          style: mainProvider.itemStyle),
-                                      Text('${total.toStringAsFixed(2)} €',
-                                          style: mainProvider.itemStyle),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+          child: StatefulBuilder(
+            builder: (BuildContext context, setState) {
+              if (selOrder == 'Nombre') {
+                cart.products.sort((a, b) => a.product.name.compareTo(b.product.name));
+              } else {
+                cart.products.sort((a, b) =>
+                    a.product.imageType.displayName().compareTo(b.product.imageType.displayName()));
+              }
+              return Container(
+                padding: const EdgeInsets.only(bottom: 10, left: 15, top: 10, right: 15),
+                decoration: BoxDecoration(
+                  color: Utils.claro,
+                  borderRadius: BorderRadius.circular(20),
                 ),
-                ZoomIn(
-                  delay: const Duration(milliseconds: 500),
-                  child: Container(
-                    padding: const EdgeInsets.only(top: 10, bottom: 10, left: 20, right: 20),
-                    decoration: BoxDecoration(
-                      color: Utils.oscuro,
-                      borderRadius: BorderRadius.circular(20),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Utils.medio,
-                          offset: const Offset(0, 5),
-                          blurRadius: 17,
-                          spreadRadius: 3,
-                        ),
-                      ],
-                    ),
-                    child: Row(
+                child: Column(
+                  children: [
+                    Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Total', style: mainProvider.itemStyle.copyWith(color: Colors.white)),
-                        Text('${cart.totalAmount.toStringAsFixed(2)} €',
-                            style: mainProvider.itemStyle.copyWith(color: Colors.white)),
+                        Text('Listado de ${cart.shop.name}', style: mainProvider.itemStyle),
+                        DropdownButton<String>(
+                          borderRadius: BorderRadius.circular(20),
+                          elevation: 16,
+                          style: TextStyle(fontSize: 17, color: Utils.oscuro),
+                          underline: Container(),
+                          value: selOrder,
+                          items: orders
+                              .map((o) => DropdownMenuItem(value: o, child: Text(o)))
+                              .toList(),
+                          onChanged: (value) => setState(() => selOrder = value!),
+                        )
                       ],
                     ),
-                  ),
+                    const SizedBox(height: 16),
+                    Expanded(
+                      child: ListView.separated(
+                        separatorBuilder: (context, index) => ZoomIn(
+                          delay: Duration(milliseconds: 100 * index),
+                          child: Divider(color: Utils.oscuro, thickness: 1),
+                        ),
+                        physics: const BouncingScrollPhysics(),
+                        itemCount: cart.products.length,
+                        itemBuilder: (context, index) {
+                          double precio = mainProvider.productsShops
+                              .firstWhere(
+                                  (p) =>
+                                      p.product.id == cart.products[index].product.id &&
+                                      p.shop.id == cart.shop.id,
+                                  orElse: () => ProductShop(0, cart.products[index].product,
+                                      cart.shop, 0, DateTime.now()))
+                              .price;
+                          double total = precio * cart.products[index].quantity;
+                          return ZoomIn(
+                            delay: Duration(milliseconds: 100 * index),
+                            child: Container(
+                              margin: const EdgeInsets.only(bottom: 5),
+                              child: Row(
+                                children: [
+                                  Image(
+                                      image: cart.products[index].product.imageType.image(),
+                                      width: 30,
+                                      height: 30),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    flex: 4,
+                                    child: SingleChildScrollView(
+                                      physics: const BouncingScrollPhysics(),
+                                      scrollDirection: Axis.horizontal,
+                                      child: Text(
+                                          cart.products[index].product.name +
+                                              (cart.products[index].product.details.isNotEmpty
+                                                  ? ' (${cart.products[index].product.details})'
+                                                  : ''),
+                                          style: mainProvider.itemStyle),
+                                    ),
+                                  ),
+                                  Expanded(
+                                    flex: 3,
+                                    child: SingleChildScrollView(
+                                      physics: const BouncingScrollPhysics(),
+                                      scrollDirection: Axis.horizontal,
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                              '${cart.products[index].quantity} x ${precio.toStringAsFixed(2)} = ',
+                                              style: mainProvider.itemStyle),
+                                          Text('${total.toStringAsFixed(2)} €',
+                                              style: mainProvider.itemStyle),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    ZoomIn(
+                      delay: const Duration(milliseconds: 500),
+                      child: Container(
+                        padding: const EdgeInsets.only(top: 10, bottom: 10, left: 20, right: 20),
+                        decoration: BoxDecoration(
+                          color: Utils.oscuro,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Utils.medio,
+                              offset: const Offset(0, 5),
+                              blurRadius: 17,
+                              spreadRadius: 3,
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text('Total',
+                                style: mainProvider.itemStyle.copyWith(color: Colors.white)),
+                            Text('${cart.totalAmount.toStringAsFixed(2)} €',
+                                style: mainProvider.itemStyle.copyWith(color: Colors.white)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              );
+            },
           ),
         );
       },

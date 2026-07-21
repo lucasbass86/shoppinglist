@@ -17,6 +17,7 @@ class TopWidget extends StatefulWidget {
   final bool showForecast;
   final bool showHiddenForecast;
   final bool showChart;
+  final bool showGroupCart;
   const TopWidget({
     super.key,
     this.title = '',
@@ -27,6 +28,7 @@ class TopWidget extends StatefulWidget {
     this.showForecast = false,
     this.showHiddenForecast = false,
     this.showChart = false,
+    this.showGroupCart = false,
   });
 
   @override
@@ -56,6 +58,7 @@ class _TopWidgetState extends State<TopWidget> with SingleTickerProviderStateMix
     bool showForecast = widget.showForecast;
     bool showHiddenForecast = widget.showHiddenForecast;
     bool showChart = widget.showChart;
+    bool showGroupCart = widget.showGroupCart;
     if (!Preferences.tutorialPage) {
       showCart = false;
       showExit = false;
@@ -104,6 +107,22 @@ class _TopWidgetState extends State<TopWidget> with SingleTickerProviderStateMix
                 ),
               ),
             ),
+            if (showGroupCart)
+              Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(20),
+                  onTap: () => mainProvider.groupCart = !mainProvider.groupCart,
+                  child: Transform.flip(
+                    flipX: !mainProvider.groupCart,
+                    child: Icon(
+                      Icons.account_tree_outlined,
+                      color: Utils.oscuro,
+                      size: Utils.iconSizeSelected,
+                    ),
+                  ),
+                ),
+              ),
             if (showForecast)
               Material(
                 color: Colors.transparent,

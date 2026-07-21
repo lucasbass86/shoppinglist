@@ -381,4 +381,13 @@ class Preferences {
     _showForecastOnRun = value;
     _prefs.setBool(_sShowForecastOnRun, value);
   }
+
+  static const String _sGroupCart = 'groupCart';
+  static bool _groupCart = false;
+  static bool get groupCart => _prefs.getBool(_sGroupCart) ?? _groupCart;
+
+  static set groupCart(bool value) {
+    _groupCart = value;
+    _prefs.setBool(_sGroupCart, value);
+  }
 }
