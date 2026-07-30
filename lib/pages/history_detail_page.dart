@@ -17,10 +17,11 @@ class HistoryDetailPage extends StatefulWidget {
 }
 
 class _HistoryDetailPageState extends State<HistoryDetailPage> {
+  late MainProvider mainProvider;
   late List<ShoppingHistory> group;
   @override
   Widget build(BuildContext context) {
-    MainProvider mainProvider = Provider.of(context);
+    mainProvider = Provider.of(context);
     group = ModalRoute.of(context)!.settings.arguments as List<ShoppingHistory>;
     group.sort((a, b) => a.order.compareTo(b.order));
     final int totalQuantity = group.fold(0, (sum, item) => sum + item.quantity);
@@ -45,187 +46,9 @@ class _HistoryDetailPageState extends State<HistoryDetailPage> {
                       padding: const EdgeInsets.all(10),
                       child: Column(
                         children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Row(
-                                children: [
-                                  Image.asset(Utils.assetShop, width: 30, height: 30),
-                                  const SizedBox(width: 10),
-                                  Text(group[0].shop.name, style: mainProvider.titleStyle),
-                                ],
-                              ),
-                              Row(
-                                spacing: 10,
-                                children: [
-                                  InkWell(
-                                      splashColor: Utils.medio,
-                                      borderRadius: BorderRadius.circular(20),
-                                      onTap: () async {
-                                        final date =
-                                            await showDate(context, initialDate: group[0].date);
-                                        if (date != null && !Utils.isSameDay(date, group[0].date)) {
-                                          for (ShoppingHistory history in group) {
-                                            history.date = date;
-                                            await Utils.boxShoppingHistory
-                                                .put(history.id, history.toJson());
-                                          }
-                                          if (context.mounted) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(Utils.snackBar('Fecha cambiada'));
-                                          }
-                                        }
-                                      },
-                                      child: Icon(Icons.calendar_month,
-                                          color: Utils.oscuro, size: 30)),
-                                  InkWell(
-                                      splashColor: Utils.medio,
-                                      borderRadius: BorderRadius.circular(20),
-                                      onTap: () => showMessage(
-                                          context: context,
-                                          message:
-                                              'Arrastrando desde el icono de la izquierda puedas cambiar el orden'),
-                                      child: Icon(Icons.info_outline_rounded,
-                                          color: Utils.oscuro, size: 30)),
-                                ],
-                              ),
-                            ],
-                          ),
+                          _headerDetail(context),
                           const SizedBox(height: 20),
-                          Expanded(
-                            child: ReorderableListView(
-                              shrinkWrap: true,
-                              physics: const BouncingScrollPhysics(),
-                              onReorder: (int oldIndex, int newIndex) {
-                                setState(() {
-                                  if (newIndex > oldIndex) {
-                                    newIndex -= 1;
-                                  }
-                                  final ShoppingHistory item = group.removeAt(oldIndex);
-                                  item.order = newIndex;
-                                  mainProvider.updateShoppingHistory(item);
-                                  group.insert(newIndex, item);
-                                  if (newIndex < oldIndex) {
-                                    for (int i = newIndex + 1; i < group.length; i++) {
-                                      final history = group[i];
-                                      history.order = i;
-                                      mainProvider.updateShoppingHistory(history);
-                                    }
-                                  } else {
-                                    for (int i = oldIndex; i < newIndex; i++) {
-                                      final history = group[i];
-                                      history.order = i;
-                                      mainProvider.updateShoppingHistory(history);
-                                    }
-                                  }
-                                });
-                              },
-                              proxyDecorator:
-                                  (Widget child, int index, Animation<double> animation) {
-                                return AnimatedBuilder(
-                                  animation: animation,
-                                  builder: (context, child) {
-                                    final double animValue =
-                                        Curves.easeInOut.transform(animation.value);
-                                    return Transform.scale(
-                                      scale: 1.0 + animValue * 0.01,
-                                      child: Material(
-                                        elevation: 12 * animValue,
-                                        borderRadius: BorderRadius.circular(20.0),
-                                        color: Utils.medio.withAlpha(130),
-                                        child: DecoratedBox(
-                                          decoration: BoxDecoration(
-                                            border: Border.all(color: Utils.oscuro),
-                                            borderRadius: BorderRadius.circular(20.0),
-                                          ),
-                                          child: child,
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                  child: child,
-                                );
-                              },
-                              children: List.generate(
-                                group.length,
-                                (index) {
-                                  late Color? c;
-                                  if (group[index].price == 0) {
-                                    c = Colors.red[800]!.withAlpha(175);
-                                  } else if (group[index].price !=
-                                      // _getProductPrice(
-                                      //     mainProvider, group[index].product, group[index].shop)
-                                      mainProvider.getProductPrice(
-                                          group[index].product, group[index].shop)) {
-                                    c = Colors.blue[800]!.withAlpha(175);
-                                  } else {
-                                    c = Utils.oscuro;
-                                  }
-                                  return Container(
-                                    // key: ValueKey(group[index]),
-                                    key: ValueKey(group[index].id),
-                                    margin: const EdgeInsets.symmetric(vertical: 1.5),
-                                    child: Row(
-                                      children: [
-                                        ReorderableDragStartListener(
-                                          index: index,
-                                          child: popupMenuButton(
-                                              context, mainProvider, group, group[index]),
-                                        ),
-                                        Expanded(
-                                          child: InkWell(
-                                            splashColor: Utils.oscuro,
-                                            borderRadius: BorderRadius.circular(20),
-                                            onTap: () {
-                                              //OBTENER EL PRODUCTO ORIGINAL:
-                                              Product product = mainProvider.products.firstWhere(
-                                                  (p) => p.id == group[index].product.id);
-                                              Navigator.pushNamed(context, ProductPage.routeName,
-                                                  arguments: product);
-                                              // Navigator.pushNamed(context, ProductPage.routeName,
-                                              //     arguments: group[index].product);
-                                            },
-                                            child: Row(
-                                              children: [
-                                                const SizedBox(width: 5),
-                                                Image(
-                                                    image: group[index].product.imageType.image(),
-                                                    width: 30,
-                                                    height: 30),
-                                                const SizedBox(width: 10),
-                                                Expanded(
-                                                  child: MarqueeWidget(
-                                                    child: Text(
-                                                        group[index].product.name +
-                                                            (group[index].product.details.isNotEmpty
-                                                                ? ' (${group[index].product.details})'
-                                                                : ''),
-                                                        style: mainProvider.itemStyle),
-                                                  ),
-                                                ),
-                                                Row(
-                                                  children: [
-                                                    Text('${group[index].quantity} x ',
-                                                        style: mainProvider.itemStyle),
-                                                    Text(group[index].price.toStringAsFixed(2),
-                                                        style: mainProvider.itemStyle
-                                                            .copyWith(color: c)),
-                                                    Text(
-                                                        ' = ${(group[index].quantity * group[index].price).toStringAsFixed(2)}€',
-                                                        style: mainProvider.itemStyle),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
+                          _items(),
                           Divider(color: Utils.oscuro),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -246,6 +69,201 @@ class _HistoryDetailPageState extends State<HistoryDetailPage> {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _headerDetail(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Row(
+          children: [
+            Image.asset(Utils.assetShop, width: 30, height: 30),
+            const SizedBox(width: 10),
+            Text(group[0].shop.name, style: mainProvider.titleStyle),
+          ],
+        ),
+        Row(
+          spacing: 10,
+          children: [
+            InkWell(
+                splashColor: Utils.medio,
+                borderRadius: BorderRadius.circular(20),
+                onTap: () async {
+                  final date = await showDate(context, initialDate: group[0].date);
+                  if (date != null && !Utils.isSameDay(date, group[0].date)) {
+                    for (ShoppingHistory history in group) {
+                      history.date = date;
+                      await Utils.boxShoppingHistory.put(history.id, history.toJson());
+                    }
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(Utils.snackBar('Fecha cambiada'));
+                    }
+                  }
+                },
+                child: Icon(Icons.calendar_month, color: Utils.oscuro, size: 30)),
+            InkWell(
+                splashColor: Utils.medio,
+                borderRadius: BorderRadius.circular(20),
+                onTap: () => showMessage(
+                    context: context,
+                    message:
+                        'Pulsando el icono izquierdo se despliega un menu contextual.\r\nManteniendo pulsada una línea, se puede desplazar para cambiar el orden.\r\nPulsando sobre un producto, se abre su detalle.'),
+                child: Icon(Icons.info_outline_rounded, color: Utils.oscuro, size: 30)),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _items() {
+    return Expanded(
+      child: ReorderableListView(
+        shrinkWrap: true,
+        physics: const BouncingScrollPhysics(),
+        onReorder: (int oldIndex, int newIndex) {
+          setState(() {
+            if (newIndex > oldIndex) {
+              newIndex -= 1;
+            }
+            final ShoppingHistory item = group.removeAt(oldIndex);
+            item.order = newIndex;
+            mainProvider.updateShoppingHistory(item);
+            group.insert(newIndex, item);
+            if (newIndex < oldIndex) {
+              for (int i = newIndex + 1; i < group.length; i++) {
+                final history = group[i];
+                history.order = i;
+                mainProvider.updateShoppingHistory(history);
+              }
+            } else {
+              for (int i = oldIndex; i < newIndex; i++) {
+                final history = group[i];
+                history.order = i;
+                mainProvider.updateShoppingHistory(history);
+              }
+            }
+          });
+        },
+        proxyDecorator: (Widget child, int index, Animation<double> animation) {
+          return Align(
+            alignment: Alignment.centerLeft,
+            child: AnimatedBuilder(
+              animation: animation,
+              builder: (context, child) {
+                final double animValue = Curves.easeInOut.transform(animation.value);
+                return Transform.scale(
+                  scale: 0.8 + animValue * 0.01,
+                  child: Material(
+                    elevation: 12 * animValue,
+                    borderRadius: BorderRadius.circular(20.0),
+                    color: Utils.medio.withAlpha(130),
+                    child: DecoratedBox(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Utils.oscuro),
+                        borderRadius: BorderRadius.circular(20.0),
+                      ),
+                      // child: child,
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image(
+                                image: group[index].product.imageType.image(),
+                                width: 50,
+                                height: 50),
+                            const SizedBox(width: 10),
+                            Text(
+                                maxLines: 2,
+                                group[index].product.name +
+                                    (group[index].product.details.isNotEmpty
+                                        ? ' (${group[index].product.details})'
+                                        : ''),
+                                style: mainProvider.itemStyle
+                                    .copyWith(color: Utils.claro, fontSize: 21)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+              child: child,
+            ),
+          );
+        },
+        children: List.generate(
+          group.length,
+          (index) {
+            late Color? c;
+            if (group[index].price == 0) {
+              c = Colors.red[800]!.withAlpha(175);
+            } else if (group[index].price !=
+                mainProvider.getProductPrice(group[index].product, group[index].shop)) {
+              c = Colors.blue[800]!.withAlpha(175);
+            } else {
+              c = Utils.oscuro;
+            }
+            return ZoomIn(
+              key: ValueKey(group[index].id),
+              delay: Duration(milliseconds: 100 * index),
+              child: Container(
+                margin: const EdgeInsets.symmetric(vertical: 1.5),
+                child: Row(
+                  children: [
+                    ReorderableDragStartListener(
+                      index: index,
+                      child: popupMenuButton(context, mainProvider, group, group[index]),
+                    ),
+                    Expanded(
+                      child: InkWell(
+                        splashColor: Utils.oscuro,
+                        borderRadius: BorderRadius.circular(20),
+                        onTap: () {
+                          Product product = mainProvider.products
+                              .firstWhere((p) => p.id == group[index].product.id);
+                          Navigator.pushNamed(context, ProductPage.routeName, arguments: product);
+                        },
+                        child: Row(
+                          children: [
+                            Image(
+                                image: group[index].product.imageType.image(),
+                                width: 30,
+                                height: 30),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: MarqueeWidget(
+                                child: Text(
+                                    group[index].product.name +
+                                        (group[index].product.details.isNotEmpty
+                                            ? ' (${group[index].product.details})'
+                                            : ''),
+                                    style: mainProvider.itemStyle),
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                Text('${group[index].quantity} x ', style: mainProvider.itemStyle),
+                                Text(group[index].price.toStringAsFixed(2),
+                                    style: mainProvider.itemStyle.copyWith(color: c)),
+                                Text(
+                                    ' = ${(group[index].quantity * group[index].price).toStringAsFixed(2)}€',
+                                    style: mainProvider.itemStyle),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
@@ -271,13 +289,9 @@ class _HistoryDetailPageState extends State<HistoryDetailPage> {
       List<ShoppingHistory> group, ShoppingHistory shoppingHistory) {
     return PopupMenuButton<EModificationType>(
       color: Utils.oscuro,
-      iconSize: 30,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(
-          Radius.circular(20.0),
-        ),
-      ),
-      icon: Icon(Icons.more_vert, color: Utils.oscuro),
+      iconSize: 25,
+      icon: Icon(Icons.drag_indicator, color: Utils.oscuro),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(20)),
       onSelected: (order) {
         switch (order) {
           case EModificationType.price:
