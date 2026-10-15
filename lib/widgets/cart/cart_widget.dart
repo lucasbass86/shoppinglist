@@ -75,8 +75,9 @@ class _CartMiniWidgetState extends State<CartMiniWidget> with TickerProviderStat
           height: 160,
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Utils.claro.withAlpha(isMoving ? 100 : 255),
+            color: Utils.oscuro.withAlpha(100),
             borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Utils.claro),
           ),
           child: Stack(
             children: [
@@ -118,7 +119,7 @@ class _CartMiniWidgetState extends State<CartMiniWidget> with TickerProviderStat
                             (widget.cartProduct.product.details.isNotEmpty
                                 ? ' (${widget.cartProduct.product.details})'
                                 : ''),
-                        style: mainProvider.titleStyle.copyWith(fontSize: 13),
+                        style: mainProvider.titleStyle.copyWith(fontSize: 13, color: Utils.claro),
                       ),
                     ),
                   ],

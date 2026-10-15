@@ -59,15 +59,17 @@ class ForecastHiddenPage extends StatelessWidget {
         Product product = mainProvider.hiddenForecast[index];
         return Container(
           padding: const EdgeInsets.all(10),
-          margin: const EdgeInsets.symmetric(horizontal: 10),
+          margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
           decoration: BoxDecoration(
-            color: Utils.claro,
+            color: Utils.oscuro.withAlpha(100),
             borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Utils.claro),
           ),
           child: ListTile(
             leading: Image(image: product.imageType.image()),
             title: MarqueeWidget(
-              child: Text(product.name, style: mainProvider.titleStyle.copyWith(fontSize: 20)),
+              child: Text(product.name,
+                  style: mainProvider.titleStyle.copyWith(fontSize: 20, color: Utils.claro)),
             ),
             trailing: Material(
               color: Colors.transparent,
@@ -84,7 +86,7 @@ class ForecastHiddenPage extends StatelessWidget {
                   },
                   child: Icon(
                     Icons.remove_red_eye_rounded,
-                    color: Utils.oscuro,
+                    color: Utils.claro,
                     size: Utils.iconSizeStandar,
                   )),
             ),

@@ -17,7 +17,6 @@ class ForecastWidget extends StatefulWidget {
 
 class _ForecastWidgetState extends State<ForecastWidget> {
   late MainProvider mainProvider;
-  bool isMoving = false;
 
   @override
   Widget build(BuildContext context) {
@@ -31,22 +30,18 @@ class _ForecastWidgetState extends State<ForecastWidget> {
           onTap: () =>
               Navigator.pushNamed(context, ProductPage.routeName, arguments: widget.entry.product),
           child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 10),
+            margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
             decoration: BoxDecoration(
-              color: Utils.claro,
+              color: Utils.oscuro.withAlpha(100),
               borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Utils.claro),
             ),
             child: ListTile(
               title: Row(
                 children: [
                   Hero(
-                    tag: '${Utils.tagProduct}${widget.entry.product.id}',
-                    child: FeedbackProductWidget(
-                      image: image,
-                      quantity: widget.entry.predictedQuantity,
-                      imageSize: 70,
-                    ),
-                  ),
+                      tag: '${Utils.tagProduct}${widget.entry.product.id}',
+                      child: Image(image: image.image, width: 70, height: 70)),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Column(
@@ -58,62 +53,64 @@ class _ForecastWidgetState extends State<ForecastWidget> {
                                   (widget.entry.product.details.isNotEmpty
                                       ? ' (${widget.entry.product.details})'
                                       : ''),
-                              style: mainProvider.titleStyle.copyWith(fontSize: 20)),
+                              style: mainProvider.titleStyle
+                                  .copyWith(fontSize: 20, color: Utils.claro)),
                         ),
                         Text(
                             Utils.dateEnglishToSpanish(widget.entry.nextPurchaseDate.toString(),
                                 showTime: false),
-                            style: mainProvider.titleStyle.copyWith(fontSize: 17)),
+                            style:
+                                mainProvider.titleStyle.copyWith(fontSize: 17, color: Utils.claro)),
                         Text(widget.entry.shop.name,
-                            style: mainProvider.titleStyle.copyWith(fontSize: 17)),
+                            style:
+                                mainProvider.titleStyle.copyWith(fontSize: 17, color: Utils.claro)),
                       ],
                     ),
                   ),
                   Text(widget.entry.predictedQuantity.toString(),
-                      style: mainProvider.titleStyle.copyWith(fontSize: 35)),
+                      style: mainProvider.titleStyle.copyWith(fontSize: 35, color: Utils.claro)),
                   const SizedBox(width: 35)
                 ],
               ),
             ),
           ),
         ),
-        if (!isMoving)
-          Positioned(
-            right: 20,
-            top: 10,
-            child: GestureDetector(
-              onTap: () {
-                if (mainProvider.shops.isNotEmpty) {
-                  CartProduct producto = CartProduct(
-                      product: widget.entry.product, quantity: widget.entry.predictedQuantity);
-                  if (mainProvider.avisoBarato) {
-                    CheapPrice barato = mainProvider.checkBarato(producto);
-                    if (barato.isCheap && context.mounted) {
-                      showMessage(
-                              context: context,
-                              cancel: true,
-                              message:
-                                  'Está más barato en ${barato.productShop.shop.name} a ${barato.productShop.price}€.\r\n¿Cambiar la tienda?')
-                          .then((value) {
-                        if (value) {
-                          mainProvider.selectedShop = barato.productShop.shop;
-                        }
-                        _addToCart(mainProvider.selectedShop, producto);
-                      });
-                    } else {
-                      _addToCart(widget.entry.shop, producto);
-                    }
+        Positioned(
+          right: 20,
+          top: 10,
+          child: GestureDetector(
+            onTap: () {
+              if (mainProvider.shops.isNotEmpty) {
+                CartProduct producto = CartProduct(
+                    product: widget.entry.product, quantity: widget.entry.predictedQuantity);
+                if (mainProvider.avisoBarato) {
+                  CheapPrice barato = mainProvider.checkBarato(producto);
+                  if (barato.isCheap && context.mounted) {
+                    showMessage(
+                            context: context,
+                            cancel: true,
+                            message:
+                                'Está más barato en ${barato.productShop.shop.name} a ${barato.productShop.price}€.\r\n¿Cambiar la tienda?')
+                        .then((value) {
+                      if (value) {
+                        mainProvider.selectedShop = barato.productShop.shop;
+                      }
+                      _addToCart(mainProvider.selectedShop, producto);
+                    });
                   } else {
                     _addToCart(widget.entry.shop, producto);
                   }
                 } else {
-                  ScaffoldMessenger.of(context)
-                      .showSnackBar(Utils.snackBar('No hay tiendas creadas', isGood: false));
+                  _addToCart(widget.entry.shop, producto);
                 }
-              },
-              child: const MenuProductRightActionWidget(isAdd: true),
-            ),
+              } else {
+                ScaffoldMessenger.of(context)
+                    .showSnackBar(Utils.snackBar('No hay tiendas creadas', isGood: false));
+              }
+            },
+            child: const MenuProductRightActionWidget(isAdd: true),
           ),
+        ),
         Positioned(
           bottom: 0,
           right: 20,
@@ -127,7 +124,7 @@ class _ForecastWidgetState extends State<ForecastWidget> {
             ),
             icon: Icon(
               Icons.more_vert_rounded,
-              color: Utils.medio,
+              color: Utils.claro,
             ),
             itemBuilder: (BuildContext context) {
               return [

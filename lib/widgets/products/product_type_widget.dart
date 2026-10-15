@@ -22,17 +22,11 @@ class ProductTypeWidget extends StatelessWidget {
           padding: const EdgeInsets.all(10),
           margin: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: mainProvider.selectedProductType == type ? Utils.oscuro : Utils.claro,
+            color: mainProvider.selectedProductType == type
+                ? Utils.claro.withAlpha(200)
+                : Utils.oscuro.withAlpha(100),
             borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              if (mainProvider.selectedProductType == type)
-                BoxShadow(
-                  color: Utils.claro.withAlpha(200),
-                  offset: const Offset(3, 3),
-                  spreadRadius: 1,
-                  blurRadius: 2,
-                ),
-            ],
+            border: Border.all(color: Utils.claro),
           ),
           child: Center(
             child: Image(image: type.image()),

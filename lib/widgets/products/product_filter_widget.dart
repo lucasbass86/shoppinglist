@@ -80,9 +80,11 @@ class _FilterItem extends StatelessWidget {
         margin: const EdgeInsets.only(right: 10),
         padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 7),
         decoration: BoxDecoration(
-          color: type == mainProvider.selectedFilter ? Utils.oscuro : Utils.claro,
+          color: Utils.oscuro.withAlpha(100),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Utils.oscuro),
+          border: Border.all(
+              width: 2,
+              color: type == mainProvider.selectedFilter ? Utils.claro : Colors.transparent),
         ),
         child: Row(
           spacing: 5,

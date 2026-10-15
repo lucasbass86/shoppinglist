@@ -37,6 +37,9 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
   String selectedYear = 'TODOS';
   List<Color> shuffledList = List.from(Utils.palettes);
 
+  List<int> years = [];
+  int selectedYearInt = DateTime.now().year;
+
   final PageController graphicPageController = PageController(initialPage: 0);
   int currentPage = 0;
 
@@ -74,11 +77,11 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
 
     productosAct = mainProvider.productsShops.where((p) => p.product.id == product.id).toList();
     historicoCompras = mainProvider.loadshoppingHistoryByProduct(product);
+    years = historicoCompras.map((e) => e.date.year).toSet().toList();
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: CustomScrollView(
-        //physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()), // Forzar desplazamiento
         slivers: [
           _mainTop(),
           _sliverTop(),
@@ -264,9 +267,8 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                     textAlign: TextAlign.justify,
                   ),
                 ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                child: categories(context),
+              CategoriesWidget(
+                onSet: () => setState(() {}),
               ),
             ],
           ),
@@ -367,41 +369,7 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                                   ],
                                 ),
                               ),
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(20),
-                                child: Container(
-                                  margin: const EdgeInsets.only(bottom: 10),
-                                  padding: const EdgeInsets.all(10),
-                                  clipBehavior: Clip.antiAlias,
-                                  decoration: BoxDecoration(
-                                    color: Utils.claro,
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            item.shop.name,
-                                            style: mainProvider.itemStyle,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                          Text(
-                                            Utils.dateEnglishToSpanish(item.date.toString()),
-                                            style: mainProvider.itemStyle.copyWith(fontSize: 13),
-                                          ),
-                                        ],
-                                      ),
-                                      Text(
-                                        '${item.price.toStringAsFixed(2)} €',
-                                        style: mainProvider.itemStyle,
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
+                              child: PriceListWidget(item: item),
                               confirmDismiss: (direction) async {
                                 bool ret = true;
                                 if (direction == DismissDirection.endToStart) {
@@ -460,7 +428,9 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                     if (!Preferences.isViewGraphic) _swipe(),
                     Row(
                       children: [
-                        Text('Gráfica', style: mainProvider.titleStyle.copyWith(fontSize: 17)),
+                        Text('Gráfica',
+                            style:
+                                mainProvider.titleStyle.copyWith(fontSize: 17, color: Utils.claro)),
                         const SizedBox(width: 7),
                         Switch(
                           value: Preferences.isViewGraphic,
@@ -475,7 +445,8 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                             children: [
                               const SizedBox(width: 10),
                               Text('Leyenda',
-                                  style: mainProvider.titleStyle.copyWith(fontSize: 13)),
+                                  style: mainProvider.titleStyle
+                                      .copyWith(fontSize: 17, color: Utils.claro)),
                               Switch(
                                 value: Preferences.showLegend,
                                 onChanged: (value) {
@@ -549,7 +520,8 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                           onTap: () =>
                               setState(() => Preferences.groupByShop = !Preferences.groupByShop),
                           child: Text('Agrupar por tienda',
-                              style: mainProvider.titleStyle.copyWith(fontSize: 13))),
+                              style: mainProvider.titleStyle
+                                  .copyWith(fontSize: 13, color: Utils.claro))),
                       const SizedBox(width: 10),
                       Switch.adaptive(
                         value: Preferences.groupByShop,
@@ -558,22 +530,29 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                       ),
                     ],
                   ),
+                  _dropYears(),
                 ],
               ),
             ),
             !Preferences.groupByShop
                 ? HistoryListProductWidget(
-                    historicoCompras: historicoCompras..sort((a, b) => b.date.compareTo(a.date)))
+                    historicoCompras:
+                        historicoCompras.where((h) => h.date.year == selectedYearInt).toList()
+                          ..sort((a, b) => b.date.compareTo(a.date)))
                 : SliverToBoxAdapter(
                     child: Column(
                     children: [
                       ...idShops.map(
                         (id) {
                           List<ShoppingHistory> his = mainProvider.shoppingHistory
-                              .where((h) => h.product.id == product.id && h.shop.id == id)
+                              .where((h) =>
+                                  h.product.id == product.id &&
+                                  h.shop.id == id &&
+                                  h.date.year == selectedYearInt)
                               .toList();
-                          return HistoryGroupedDetailWidget(
-                              shoppingHistory: his, type: ETypeShoppings.byShop);
+                          return his.isNotEmpty
+                              ? HistoryForProductGroupedByShop(shoppingHistory: his)
+                              : SizedBox.shrink();
                         },
                       ),
                     ],
@@ -606,6 +585,45 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
           ];
   }
 
+  Widget _dropYears() {
+    return Container(
+      margin: const EdgeInsets.only(left: 10),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: Utils.claro,
+        ),
+      ),
+      child: Row(
+        spacing: 5,
+        children: [
+          Icon(
+            Icons.calendar_month,
+            color: Utils.claro,
+          ),
+          DropdownButton(
+            borderRadius: BorderRadius.circular(20),
+            dropdownColor: Utils.oscuro,
+            isExpanded: false,
+            value: selectedYearInt,
+            underline: Container(),
+            items: years.map<DropdownMenuItem<int>>((int value) {
+              return DropdownMenuItem<int>(
+                value: value,
+                child: Text(value.toString(),
+                    style: mainProvider.itemStyle.copyWith(fontSize: 13, color: Utils.claro)),
+              );
+            }).toList(),
+            onChanged: <int>(value) {
+              selectedYearInt = value;
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _touch() {
     return InkWell(
       borderRadius: BorderRadius.circular(20),
@@ -634,76 +652,6 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
               const SizedBox(width: 15),
               Icon(Icons.add, color: Utils.oscuro, size: 40),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget categories(BuildContext context) {
-    return Container(
-      height: 60,
-      margin: const EdgeInsets.only(right: 20),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
-        child: SingleChildScrollView(
-          clipBehavior: Clip.hardEdge,
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
-          child: Row(
-            children: [
-              BounceInLeft(
-                duration: Utils.fadeInDuration,
-                child: category('Precios', EProductView.prices,
-                    Preferences.productTabIndex == EProductView.prices),
-              ),
-              const SizedBox(width: 15),
-              BounceInRight(
-                duration: Utils.fadeInDuration,
-                child: category('Estadística', EProductView.estatistics,
-                    Preferences.productTabIndex == EProductView.estatistics),
-              ),
-              const SizedBox(width: 15),
-              BounceInDown(
-                duration: Utils.fadeInDuration,
-                child: category('Historial', EProductView.history,
-                    Preferences.productTabIndex == EProductView.history),
-              ),
-              const SizedBox(width: 15),
-              BounceInUp(
-                duration: Utils.fadeInDuration,
-                child: category('Gráficas', EProductView.graphics,
-                    Preferences.productTabIndex == EProductView.graphics),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget category(String name, EProductView productView, bool isSelected) {
-    return GestureDetector(
-      onTap: () => setState(() {
-        Preferences.productTabIndex = productView;
-      }),
-      child: Container(
-        height: 50,
-        padding: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: isSelected ? Utils.oscuro : Utils.claro,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: Utils.oscuro,
-            width: 2,
-          ),
-        ),
-        child: Center(
-          child: Text(
-            name,
-            style: isSelected
-                ? mainProvider.itemStyleN.copyWith(color: Utils.claro)
-                : mainProvider.itemStyleN,
           ),
         ),
       ),
@@ -840,27 +788,27 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
             child: Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Utils.claro,
+                color: Utils.oscuro.withAlpha(100),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: Utils.oscuro,
-                  width: 1,
-                ),
+                border: Border.all(color: Utils.claro),
               ),
               child: RepaintBoundary(
                 child: SfCartesianChart(
                   primaryXAxis: CategoryAxis(
                     labelRotation: 45,
-                    labelStyle: const TextStyle(fontSize: 10),
+                    labelStyle: TextStyle(fontSize: 10, color: Utils.claro),
                     axisLabelFormatter: (details) {
                       final fechaEsp = Utils.dateEnglishToSpanish(details.text, showTime: false);
                       return ChartAxisLabel(fechaEsp, details.textStyle);
                     },
                   ),
-                  primaryYAxis: NumericAxis(labelFormat: '{value}€'),
+                  primaryYAxis: NumericAxis(
+                    labelFormat: '{value}€',
+                    labelStyle: TextStyle(color: Utils.claro),
+                  ),
                   legend: Legend(
                     isVisible: Preferences.showLegend,
-                    textStyle: TextStyle(color: mainProvider.itemStyle.color),
+                    textStyle: TextStyle(color: Utils.claro),
                   ),
                   tooltipBehavior: TooltipBehavior(enable: true),
                   series: graf,
@@ -882,109 +830,8 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
             itemBuilder: (context, index) {
               return FadeInLeft(
                 delay: Duration(milliseconds: 100 * index),
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: Utils.claro,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        spacing: 10,
-                        children: [
-                          Image.asset(Utils.assetShop, width: 30, height: 30),
-                          Text(principal[index].shop.name,
-                              style: TextStyle(color: Utils.oscuro, fontSize: 21)),
-                        ],
-                      ),
-                      const SizedBox(height: 10),
-                      ListView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: principal[index].list.length,
-                        shrinkWrap: true,
-                        itemBuilder: (context, index2) {
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 15),
-                            child: Dismissible(
-                              key: Key(principal[index].list[index2].historicoPrecio.id.toString()),
-                              background: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Icon(Icons.delete, size: 20, color: Colors.red[300]),
-                                  Icon(Icons.edit, size: 20, color: Colors.green[300]),
-                                ],
-                              ),
-                              confirmDismiss: (direction) async {
-                                bool ret = true;
-
-                                if (direction == DismissDirection.startToEnd) {
-                                  await showMessage(
-                                          context: context,
-                                          message: '¿Borrar el precio?',
-                                          cancel: true)
-                                      .then((value) {
-                                    if (value) {
-                                      ret = true;
-                                      mainProvider.deleteHistoricoPrecio(
-                                          principal[index].list[index2].historicoPrecio);
-                                    } else {
-                                      ret = false;
-                                    }
-                                  });
-                                } else {
-                                  DateTime? date =
-                                      principal[index].list[index2].historicoPrecio.fecha;
-                                  final c = await showProductPrice(context, productosAct[index]);
-                                  if (c[0] && context.mounted) {
-                                    final value = await showDate(context, initialDate: date);
-                                    if (value != null) {
-                                      date = DateTime(value.year, value.month, value.day,
-                                          DateTime.now().hour + 1, DateTime.now().minute);
-                                    }
-                                    mainProvider.calculateAmount();
-                                    principal[index].list[index2].historicoPrecio.fecha = date;
-                                    principal[index]
-                                        .list[index2]
-                                        .historicoPrecio
-                                        .productShop
-                                        .price = c[1];
-                                    mainProvider.updateHistoricoPrecio(
-                                        principal[index].list[index2].historicoPrecio);
-                                    ret = true;
-                                  }
-                                  ret = false;
-                                }
-                                setState(() {});
-                                return ret;
-                              },
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    Utils.dateEnglishToSpanish(
-                                        principal[index]
-                                            .list[index2]
-                                            .historicoPrecio
-                                            .fecha
-                                            .toString(),
-                                        showTime: false),
-                                    style: TextStyle(color: Utils.oscuro, fontSize: 17),
-                                  ),
-                                  Text(
-                                    '${principal[index].list[index2].historicoPrecio.productShop.price.toStringAsFixed(2)} €',
-                                    style: TextStyle(color: Utils.oscuro, fontSize: 17),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ],
-                  ),
-                ),
+                child: StatisticsProductListWidget(
+                    principal: principal[index], productShop: productosAct[index]),
               );
             },
           );
@@ -1063,7 +910,8 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
           dataLabelMapper: (_PieDataShops data, _) => Preferences.graphicByAmount
               ? '${data.quantity.toStringAsFixed(2)}€'
               : data.quantity.toStringAsFixed(0),
-          dataLabelSettings: DataLabelSettings(isVisible: true),
+          dataLabelSettings: DataLabelSettings(
+              isVisible: true, textStyle: TextStyle(color: Utils.oscuro), color: Utils.claro),
         )
       ];
       seriesLinear = [
@@ -1075,7 +923,8 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
           dataLabelMapper: (_PieDataShops data, _) => Preferences.graphicByAmount
               ? '${data.quantity.toStringAsFixed(2)}€'
               : data.quantity.toStringAsFixed(0),
-          dataLabelSettings: DataLabelSettings(isVisible: true),
+          dataLabelSettings:
+              DataLabelSettings(isVisible: true, textStyle: TextStyle(color: Utils.claro)),
           pointColorMapper: (data, index) => shuffledList[Random().nextInt(shuffledList.length)],
         ),
       ];
@@ -1092,14 +941,15 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                   spacing: 7,
                   children: [
                     Image.asset(Utils.assetShop, width: 20, height: 20),
-                    Text(data[index].shopName, style: mainProvider.itemStyle),
+                    Text(data[index].shopName,
+                        style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
                   ],
                 ),
                 Text(
                     Preferences.graphicByAmount
                         ? '${data[index].quantity.toStringAsFixed(2)}€'
                         : data[index].quantity.toStringAsFixed(0),
-                    style: mainProvider.itemStyle),
+                    style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
               ],
             ),
           );
@@ -1145,7 +995,7 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
           dataLabelMapper: (_PieDataShopYears data, _) => Preferences.graphicByAmount
               ? '${data.quantity.toStringAsFixed(2)}€'
               : data.quantity.toStringAsFixed(0),
-          dataLabelSettings: DataLabelSettings(isVisible: true),
+          dataLabelSettings: DataLabelSettings(isVisible: true, color: Utils.claro),
         ),
       ];
       seriesLinear = [
@@ -1157,7 +1007,8 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
           dataLabelMapper: (_PieDataShopYears data, _) => Preferences.graphicByAmount
               ? '${data.quantity.toStringAsFixed(2)}€'
               : data.quantity.toStringAsFixed(0),
-          dataLabelSettings: DataLabelSettings(isVisible: true),
+          dataLabelSettings:
+              DataLabelSettings(isVisible: true, textStyle: TextStyle(color: Utils.claro)),
           pointColorMapper: (data, index) => shuffledList[Random().nextInt(shuffledList.length)],
         ),
       ];
@@ -1170,12 +1021,12 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(data[index].year, style: mainProvider.itemStyle),
+                Text(data[index].year, style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
                 Text(
                     Preferences.graphicByAmount
                         ? '${data[index].quantity.toStringAsFixed(2)}€'
                         : data[index].quantity.toStringAsFixed(0),
-                    style: mainProvider.itemStyle),
+                    style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
               ],
             ),
           );
@@ -1236,7 +1087,7 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
           dataLabelMapper: (_PieDataShopYear data, _) => Preferences.graphicByAmount
               ? '${data.quantity.toStringAsFixed(2)}€'
               : data.quantity.toStringAsFixed(0),
-          dataLabelSettings: DataLabelSettings(isVisible: true),
+          dataLabelSettings: DataLabelSettings(isVisible: true, color: Utils.claro),
         )
       ];
       seriesLinear = [
@@ -1248,7 +1099,8 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
           dataLabelMapper: (_PieDataShopYear data, _) => Preferences.graphicByAmount
               ? '${data.quantity.toStringAsFixed(2)}€'
               : data.quantity.toStringAsFixed(0),
-          dataLabelSettings: DataLabelSettings(isVisible: true),
+          dataLabelSettings:
+              DataLabelSettings(isVisible: true, textStyle: TextStyle(color: Utils.claro)),
           pointColorMapper: (data, index) => shuffledList[Random().nextInt(shuffledList.length)],
         )
       ];
@@ -1265,15 +1117,16 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                 Row(
                   spacing: 7,
                   children: [
-                    Icon(Icons.calendar_month, color: Utils.oscuro),
-                    Text(data[index].monthName!, style: mainProvider.itemStyle),
+                    Icon(Icons.calendar_month, color: Utils.claro),
+                    Text(data[index].monthName!,
+                        style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
                   ],
                 ),
                 Text(
                     Preferences.graphicByAmount
                         ? '${data[index].quantity.toStringAsFixed(2)}€'
                         : data[index].quantity.toStringAsFixed(0),
-                    style: mainProvider.itemStyle),
+                    style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
               ],
             ),
           );
@@ -1303,7 +1156,8 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                 mainAxisAlignment: MainAxisAlignment.end,
                 spacing: 5,
                 children: [
-                  Text('Datos por: Cantidad', style: mainProvider.itemStyle),
+                  Text('Datos por: Cantidad',
+                      style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
                   Switch(
                     value: Preferences.graphicByAmount,
                     onChanged: (value) {
@@ -1312,7 +1166,7 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                       });
                     },
                   ),
-                  Text('Importe', style: mainProvider.itemStyle),
+                  Text('Importe', style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
                   const SizedBox(width: 20),
                 ],
               ),
@@ -1320,42 +1174,54 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 spacing: 10,
                 children: [
-                  DropdownButton(
-                    borderRadius: BorderRadius.circular(20),
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    dropdownColor: Utils.claro,
-                    isExpanded: false,
-                    value: selectedShopName,
-                    underline: Container(),
-                    alignment: Alignment.center,
-                    items: names.map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value.toUpperCase(), style: mainProvider.itemStyle),
-                      );
-                    }).toList(),
-                    onChanged: <String>(value) {
-                      selectedShopName = value;
-                      selectedYear = 'TODOS';
-                    },
+                  Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Utils.claro)),
+                    child: DropdownButton(
+                      borderRadius: BorderRadius.circular(20),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      dropdownColor: Utils.oscuro,
+                      isExpanded: false,
+                      value: selectedShopName,
+                      underline: Container(),
+                      alignment: Alignment.center,
+                      items: names.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value.toUpperCase(),
+                              style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
+                        );
+                      }).toList(),
+                      onChanged: <String>(value) {
+                        selectedShopName = value;
+                        selectedYear = 'TODOS';
+                      },
+                    ),
                   ),
-                  DropdownButton(
-                    borderRadius: BorderRadius.circular(20),
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    dropdownColor: Utils.claro,
-                    isExpanded: false,
-                    value: selectedYear,
-                    underline: Container(),
-                    alignment: Alignment.center,
-                    items: yearsOfDropDown.map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value.toUpperCase(), style: mainProvider.itemStyle),
-                      );
-                    }).toList(),
-                    onChanged: <String>(value) {
-                      selectedYear = value;
-                    },
+                  Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Utils.claro)),
+                    child: DropdownButton(
+                      borderRadius: BorderRadius.circular(20),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      dropdownColor: Utils.oscuro,
+                      isExpanded: false,
+                      value: selectedYear,
+                      underline: Container(),
+                      alignment: Alignment.center,
+                      items: yearsOfDropDown.map<DropdownMenuItem<String>>((String value) {
+                        return DropdownMenuItem<String>(
+                          value: value,
+                          child: Text(value.toUpperCase(),
+                              style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
+                        );
+                      }).toList(),
+                      onChanged: <String>(value) {
+                        selectedYear = value;
+                      },
+                    ),
                   ),
                 ],
               ),
@@ -1369,12 +1235,9 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
               padding: const EdgeInsets.all(10),
               margin: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Utils.claro,
+                color: Utils.oscuro.withAlpha(100),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: Utils.oscuro,
-                  width: 1,
-                ),
+                border: Border.all(color: Utils.claro),
               ),
               child: Column(
                 children: [
@@ -1391,28 +1254,40 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                         RepaintBoundary(
                           child: SfCircularChart(
                             palette: shuffledList,
-                            legend: Legend(isVisible: true),
+                            legend:
+                                Legend(isVisible: true, textStyle: TextStyle(color: Utils.claro)),
                             series: series,
-                            tooltipBehavior: TooltipBehavior(enable: true),
+                            tooltipBehavior: TooltipBehavior(
+                              enable: true,
+                              color: Utils.oscuro,
+                              textStyle: TextStyle(color: Utils.claro),
+                            ),
                           ),
                         ),
                         RepaintBoundary(
                           child: SfCartesianChart(
-                            primaryXAxis: const CategoryAxis(
+                            primaryXAxis: CategoryAxis(
                               labelRotation: 45,
-                              labelStyle: TextStyle(fontSize: 12),
+                              labelStyle: TextStyle(fontSize: 12, color: Utils.claro),
                             ),
                             primaryYAxis: NumericAxis(
                               title: AxisTitle(
-                                  text: Preferences.graphicByAmount ? 'Importe' : 'Cantidad'),
+                                  text: Preferences.graphicByAmount ? 'Importe' : 'Cantidad',
+                                  textStyle: TextStyle(color: Utils.claro)),
                               minimum: 0,
                               labelFormat: '{value}',
+                              labelStyle: TextStyle(color: Utils.claro),
                               numberFormat: NumberFormat.decimalPatternDigits(
                                   decimalDigits: Preferences.graphicByAmount ? 2 : 0),
                             ),
                             palette: shuffledList,
-                            legend: Legend(isVisible: false),
-                            tooltipBehavior: TooltipBehavior(enable: true),
+                            legend:
+                                Legend(isVisible: false, textStyle: TextStyle(color: Utils.claro)),
+                            tooltipBehavior: TooltipBehavior(
+                              enable: true,
+                              color: Utils.oscuro,
+                              textStyle: TextStyle(color: Utils.claro),
+                            ),
                             series: seriesLinear,
                             zoomPanBehavior: ZoomPanBehavior(
                               enablePinching: true,
@@ -1426,32 +1301,44 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                       ],
                     ),
                   ),
-                  SizedBox(
-                    height: 15,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      spacing: 10,
-                      children: [
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 600),
-                          width: currentPage == 0 ? 25 : 10,
-                          height: currentPage == 0 ? 15 : 10,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Utils.medio,
-                          ),
+                  Stack(
+                    children: [
+                      SizedBox(
+                        height: 15,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          spacing: 10,
+                          children: [
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 600),
+                              width: currentPage == 0 ? 25 : 10,
+                              height: currentPage == 0 ? 15 : 10,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Utils.claro,
+                              ),
+                            ),
+                            AnimatedContainer(
+                              duration: const Duration(milliseconds: 600),
+                              width: currentPage == 1 ? 25 : 10,
+                              height: currentPage == 1 ? 15 : 10,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: Utils.claro,
+                              ),
+                            )
+                          ],
                         ),
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 600),
-                          width: currentPage == 1 ? 25 : 10,
-                          height: currentPage == 1 ? 15 : 10,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            color: Utils.medio,
-                          ),
-                        )
-                      ],
-                    ),
+                      ),
+                      GestureDetector(
+                        onTap: () => Navigator.pushNamed(context, MaximizeCharPage.routeName,
+                            arguments: [series, seriesLinear]),
+                        child: Icon(
+                          Icons.fit_screen_rounded,
+                          color: Utils.claro,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -1464,12 +1351,9 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
               padding: const EdgeInsets.all(10),
               margin: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Utils.claro,
+                color: Utils.oscuro.withAlpha(100),
                 borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: Utils.oscuro,
-                  width: 1,
-                ),
+                border: Border.all(color: Utils.claro),
               ),
               child: Column(
                 children: [
@@ -1478,59 +1362,56 @@ class _ProductPageState extends State<ProductPage> with SingleTickerProviderStat
                       spacing: 20,
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Text('Ordenar por', style: mainProvider.itemStyle),
-                        DropdownButton<EOrderGraphic>(
-                          isExpanded: false,
-                          elevation: 16,
-                          style: TextStyle(fontSize: 20, color: Utils.oscuro),
-                          dropdownColor: Utils.claro,
-                          borderRadius: BorderRadius.circular(20),
-                          underline: Container(height: 2),
-                          value: Preferences.graphicProductGeneralOrder,
-                          items: EOrderGraphic.values
-                              .map((o) => DropdownMenuItem(value: o, child: Text(o.displayName())))
-                              .toList(),
-                          onChanged: (value) {
-                            if (value != Preferences.graphicProductGeneralOrder) {
-                              setState(() {
-                                Preferences.graphicProductGeneralOrder = value!;
-                              });
-                            }
-                          },
-                          selectedItemBuilder: (context) {
-                            return EOrderGraphic.values.map((p) {
-                              return DropdownMenuItem(
-                                  value: p,
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(20),
-                                      color: Utils.claro,
-                                    ),
-                                    child: Center(
-                                      child: Text(
-                                        p.displayName(),
-                                        style: TextStyle(fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                  ));
-                            }).toList();
-                          },
+                        Text('Ordenar por',
+                            style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          decoration: BoxDecoration(
+                            color: Utils.oscuro.withAlpha(100),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Utils.claro),
+                          ),
+                          child: DropdownButton<EOrderGraphic>(
+                            isExpanded: false,
+                            elevation: 16,
+                            style: TextStyle(fontSize: 20, color: Utils.oscuro),
+                            dropdownColor: Utils.oscuro,
+                            borderRadius: BorderRadius.circular(20),
+                            underline: Container(height: 2),
+                            value: Preferences.graphicProductGeneralOrder,
+                            items: EOrderGraphic.values
+                                .map((o) => DropdownMenuItem(
+                                    value: o,
+                                    child: Text(
+                                      o.displayName(),
+                                      style: TextStyle(color: Utils.claro),
+                                    )))
+                                .toList(),
+                            onChanged: (value) {
+                              if (value != Preferences.graphicProductGeneralOrder) {
+                                setState(() {
+                                  Preferences.graphicProductGeneralOrder = value!;
+                                });
+                              }
+                            },
+                          ),
                         ),
                       ],
                     ),
+                  const SizedBox(height: 10),
                   listView,
                   Divider(
-                    color: Utils.oscuro,
+                    color: Utils.claro,
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Total', style: mainProvider.itemStyle),
+                      Text('Total', style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
                       Text(
                           Preferences.graphicByAmount
                               ? '${totalAmount.toStringAsFixed(2)}€'
                               : totalAmount.toStringAsFixed(0),
-                          style: mainProvider.itemStyle),
+                          style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
                     ],
                   )
                 ],

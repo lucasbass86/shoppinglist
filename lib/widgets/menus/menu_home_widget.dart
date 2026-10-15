@@ -36,8 +36,9 @@ class MenuHomeWidget extends StatelessWidget {
           padding: const EdgeInsets.all(10),
           margin: const EdgeInsets.all(20),
           decoration: BoxDecoration(
+            color: Utils.oscuro.withAlpha(100),
             borderRadius: BorderRadius.circular(20),
-            color: Utils.claro,
+            border: Border.all(color: Utils.claro, width: 2),
           ),
           child: Stack(
             children: [
@@ -54,7 +55,8 @@ class MenuHomeWidget extends StatelessWidget {
                     ),
                     const SizedBox(height: 5),
                     Text(name,
-                        style: mainProvider.titleStyle.copyWith(fontSize: fontSize),
+                        style: mainProvider.titleStyle
+                            .copyWith(fontSize: fontSize, color: Utils.claro),
                         overflow: TextOverflow.ellipsis),
                   ],
                 ),

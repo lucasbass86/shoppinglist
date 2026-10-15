@@ -40,13 +40,14 @@ class GraphicProductWidget extends StatelessWidget {
     }
     final double totalAmount = shoppingHistory.fold(0, (prev, s) => prev + (s.price * s.quantity));
     final double totalQuantity = shoppingHistory.fold(0, (prev, s) => prev + s.quantity);
-    return Card(
-      color: Utils.claro,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      borderOnForeground: false,
-      elevation: 20,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(20),
+    return ClipRRect(
+      borderRadius: BorderRadiusGeometry.circular(20),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Utils.oscuro.withAlpha(100),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Utils.claro),
+        ),
         child: ExpansionTile(
           iconColor: Utils.medio,
           collapsedIconColor: Utils.medio,
@@ -62,13 +63,15 @@ class GraphicProductWidget extends StatelessWidget {
                     child: Image(image: product.imageType.image(), width: 30, height: 30)),
                 const SizedBox(width: 10),
                 Expanded(
-                    child: MarqueeWidget(child: Text(product.name, style: mainProvider.itemStyle))),
+                    child: MarqueeWidget(
+                        child: Text(product.name,
+                            style: mainProvider.itemStyle.copyWith(color: Utils.claro)))),
                 const SizedBox(width: 10),
                 Text(
                     Preferences.graphicByAmount
                         ? '${quantity.toStringAsFixed(2)}€'
                         : quantity.toStringAsFixed(0),
-                    style: mainProvider.itemStyle),
+                    style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
               ],
             ),
           ),
@@ -83,16 +86,19 @@ class GraphicProductWidget extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(Utils.dateEnglishToSpanish(h.date.toString(), showTime: false),
-                          style: mainProvider.itemStyle),
+                          style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
                     ),
                     Text('${h.quantity}x',
-                        style: mainProvider.itemStyle.copyWith(fontWeight: FontWeight.w600)),
+                        style: mainProvider.itemStyle
+                            .copyWith(fontWeight: FontWeight.w600, color: Utils.claro)),
                     const SizedBox(width: 6),
-                    Text('${h.price.toStringAsFixed(2)}€', style: mainProvider.itemStyle),
+                    Text('${h.price.toStringAsFixed(2)}€',
+                        style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
                     const SizedBox(width: 6),
                     Text(
                       '= ${(h.quantity * h.price).toStringAsFixed(2)}€',
-                      style: mainProvider.itemStyle.copyWith(fontWeight: FontWeight.bold),
+                      style: mainProvider.itemStyle
+                          .copyWith(fontWeight: FontWeight.bold, color: Utils.claro),
                     ),
                   ],
                 );
@@ -123,7 +129,7 @@ class GraphicProductWidget extends StatelessWidget {
                     style: mainProvider.mainTitleStyle.copyWith(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Utils.oscuro,
+                      color: Utils.claro,
                     ),
                   ),
                   Column(
@@ -131,11 +137,11 @@ class GraphicProductWidget extends StatelessWidget {
                     children: [
                       Text(
                         '${totalAmount.toStringAsFixed(2)}€',
-                        style: mainProvider.itemStyle,
+                        style: mainProvider.itemStyle.copyWith(color: Utils.claro),
                       ),
                       Text(
                         '${totalQuantity.toStringAsFixed(0)} uds',
-                        style: mainProvider.itemStyle,
+                        style: mainProvider.itemStyle.copyWith(color: Utils.claro),
                       ),
                     ],
                   ),

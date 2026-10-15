@@ -86,8 +86,9 @@ class _UserPageState extends State<UserPage> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Utils.claro,
+                color: Utils.oscuro.withAlpha(100),
                 borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Utils.claro),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -366,8 +367,9 @@ class _UserPageState extends State<UserPage> {
               width: double.infinity,
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: Utils.claro,
+                color: Utils.oscuro.withAlpha(100),
                 borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Utils.claro),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,

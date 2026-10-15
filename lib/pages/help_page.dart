@@ -156,17 +156,21 @@ class _HelpWidget extends StatelessWidget {
     MainProvider mainProvider = Provider.of<MainProvider>(context);
     return Container(
       margin: const EdgeInsets.only(bottom: 15),
+      decoration: BoxDecoration(
+        color: Utils.oscuro.withAlpha(100),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Utils.claro),
+      ),
       child: ExpansionTile(
-        backgroundColor: Utils.claro,
         leading:
             !mainProvider.updateView && showExclamation ? Icon(Icons.info_outline_rounded) : null,
-        title: Text(title, style: mainProvider.titleStyle.copyWith(fontSize: 20)),
+        title:
+            Text(title, style: mainProvider.titleStyle.copyWith(fontSize: 20, color: Utils.claro)),
         childrenPadding: const EdgeInsets.all(10),
         shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(20)),
         showTrailingIcon: true,
-        collapsedBackgroundColor: Utils.claro,
-        collapsedIconColor: Utils.oscuro,
-        iconColor: Utils.oscuro,
+        collapsedIconColor: Utils.claro,
+        iconColor: Utils.claro,
         collapsedShape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(20)),
         children: [
           SizedBox(
@@ -174,6 +178,7 @@ class _HelpWidget extends StatelessWidget {
             child: Text(
               message,
               textAlign: justify ? TextAlign.justify : TextAlign.left,
+              style: TextStyle(color: Utils.claro),
             ),
           )
         ],

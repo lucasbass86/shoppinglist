@@ -19,12 +19,9 @@ class ShopWidget extends StatelessWidget {
         padding: const EdgeInsets.all(10),
         child: Container(
           decoration: BoxDecoration(
-            color: Utils.claro,
+            color: Utils.oscuro.withAlpha(100),
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: Utils.oscuro,
-              width: 1,
-            ),
+            border: Border.all(color: Utils.claro),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -41,7 +38,7 @@ class ShopWidget extends StatelessWidget {
               MarqueeWidget(
                 child: Text(
                   shop.name,
-                  style: mainProvider.titleStyle.copyWith(fontSize: 15),
+                  style: mainProvider.titleStyle.copyWith(fontSize: 15, color: Utils.claro),
                 ),
               ),
             ],

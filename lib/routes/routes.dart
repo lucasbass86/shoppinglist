@@ -21,4 +21,5 @@ Map<String, Widget Function(BuildContext)> routes = <String, WidgetBuilder>{
   ForecastPage.routeName: (_) => const ForecastPage(),
   ForecastHiddenPage.routeName: (_) => const ForecastHiddenPage(),
   ChartAmountPage.routeName: (_) => const ChartAmountPage(),
+  MaximizeCharPage.routeName: (_) => const MaximizeCharPage(),
 };

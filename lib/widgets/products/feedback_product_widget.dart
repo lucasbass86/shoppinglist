@@ -5,12 +5,12 @@ class FeedbackProductWidget extends StatelessWidget {
   final Image image;
   final int quantity;
   final double imageSize;
-  const FeedbackProductWidget({super.key, required this.image, required this.quantity, this.imageSize = 130});
+  const FeedbackProductWidget(
+      {super.key, required this.image, required this.quantity, this.imageSize = 130});
 
   @override
   Widget build(BuildContext context) {
-    final double size = _calculateSize();
-    final double fontSize = _calculateFontSize();
+    final double size = 35;
     return SizedBox(
       width: imageSize,
       height: imageSize,
@@ -30,14 +30,19 @@ class FeedbackProductWidget extends StatelessWidget {
                 );
               },
               child: Container(
+                padding: const EdgeInsets.all(10),
                 width: size,
                 height: size,
                 decoration: BoxDecoration(
                   color: Utils.colorNumItems,
                   shape: BoxShape.circle,
                 ),
-                child: Center(
-                  child: Text('$quantity', style: TextStyle(fontSize: fontSize, color: Colors.white, decoration: TextDecoration.none)),
+                child: FittedBox(
+                  fit: BoxFit.cover,
+                  child: Text(
+                    '$quantity',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
             ),
@@ -46,8 +51,4 @@ class FeedbackProductWidget extends StatelessWidget {
       ),
     );
   }
-
-  double _calculateSize() => Utils.productImageSize <= Utils.productImageSizeStandar ? 30 : 50;
-
-  double _calculateFontSize() => Utils.productImageSize <= Utils.productImageSizeStandar ? 17 : 27;
 }

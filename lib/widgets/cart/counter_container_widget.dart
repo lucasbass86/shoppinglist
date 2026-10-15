@@ -17,7 +17,8 @@ class CounterContainerWidget extends StatefulWidget {
   State<CounterContainerWidget> createState() => _CounterContainerWidgetState();
 }
 
-class _CounterContainerWidgetState extends State<CounterContainerWidget> with SingleTickerProviderStateMixin {
+class _CounterContainerWidgetState extends State<CounterContainerWidget>
+    with SingleTickerProviderStateMixin {
   late AnimationController controller;
 
   @override
@@ -38,8 +39,7 @@ class _CounterContainerWidgetState extends State<CounterContainerWidget> with Si
 
   @override
   Widget build(BuildContext context) {
-    final double size = Utils.productImageSize <= Utils.productImageSizeStandar ? 30 : 50;
-    final double fontSize = Utils.productImageSize <= Utils.productImageSizeStandar ? 17 : 27;
+    final double size = 35;
     MainProvider provider = Provider.of<MainProvider>(context);
     return GestureDetector(
       onTap: () {
@@ -49,14 +49,19 @@ class _CounterContainerWidgetState extends State<CounterContainerWidget> with Si
       child: BounceInDown(
         controller: (c) => controller = c,
         child: Container(
+          padding: const EdgeInsets.all(10),
           width: size,
           height: size,
           decoration: BoxDecoration(
             color: Utils.colorNumItems,
             shape: BoxShape.circle,
           ),
-          child: Center(
-            child: Text('${widget.cartProduct.quantity}', style: TextStyle(fontSize: fontSize)),
+          child: FittedBox(
+            fit: BoxFit.cover,
+            child: Text(
+              '${widget.cartProduct.quantity}',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
           ),
         ),
       ),

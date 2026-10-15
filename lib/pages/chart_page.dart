@@ -393,7 +393,7 @@ class _Product extends StatelessWidget {
           children: [
             ...shops.map((shop) {
               List<ShoppingHistory> his = history.where((h) => h.shop.id == shop.id).toList();
-              return HistoryGroupedDetailWidget(shoppingHistory: his, type: ETypeShoppings.byShop);
+              return HistoryGroupedDetailWidget(shoppingHistory: his);
             }),
             //TOTAL POR PRODUCTO
             Card(

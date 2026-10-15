@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shoppinglist/dialogs/bottoms.dart';
 import 'package:shoppinglist/models/models.dart';
 import 'package:shoppinglist/pages/_pages.dart';
 import 'package:shoppinglist/providers/main_provider.dart';
@@ -20,258 +21,197 @@ class HistoryShopGroupedByDate extends StatefulWidget {
 class _HistoryShopGroupedByDateState extends State<HistoryShopGroupedByDate> {
   late MainProvider mainProvider;
   int countShowSaving = 0;
+
+  //OPTIMIZADO PARA VER DESDE UNA TIENDA
   @override
   Widget build(BuildContext context) {
     mainProvider = Provider.of<MainProvider>(context, listen: false);
-    final months = widget.shoppingHistory.map((e) => e.date.month).toSet().toList()
+    final List<int> months = widget.shoppingHistory.map((s) => s.date.month).toSet().toList()
       ..sort((a, b) => b.compareTo(a));
-
-    final double totalAmount = widget.shoppingHistory.fold(
-      0,
-      (previousValue, element) => previousValue + (element.price * element.quantity),
-    );
-    final int totalQuantity = widget.shoppingHistory
-        .fold(0, (previousValue, element) => previousValue + element.quantity);
-
-    List<ShoppingHistory> nullPricesLevel1 =
-        widget.shoppingHistory.where((h) => h.price == 0).toList();
-
-    return HistoryLevel1Widget(
-      expansionTitle: _level1Header(),
-      children: [
-        ...months.map((month) {
-          final histMonth = widget.shoppingHistory.where((h) => h.date.month == month).toList();
-          final days = histMonth.map((h) => h.date.day).toSet().toList()..sort();
-          days.sort((a, b) => b.compareTo(a));
-          final totalQuantityMonth = histMonth.fold<int>(0, (sum, item) => sum + item.quantity);
-          final totalPriceMonth =
-              histMonth.fold<double>(0, (sum, item) => sum + (item.quantity * item.price));
-
-          List<ShoppingHistory> nullPricesLevel2 = histMonth.where((h) => h.price == 0).toList();
-
-          return HistoryLevel2Widget(
-            expansionTitle: _level2Header(month),
-            children: [
-              ...days.map((day) => _dayDetail(day, histMonth)),
-              const SizedBox(height: 10),
-              GestureDetector(
-                onTap: () async {
-                  countShowSaving++;
-                  if (countShowSaving == 3) {
-                    await _showSavingAmount(context, nullPricesLevel2);
-                    countShowSaving = 0;
-                  }
-                },
-                child: HistoryLevelTotalWidget(
-                  uds: totalQuantityMonth,
-                  amount: totalPriceMonth,
-                  title: 'Total ${Utils.monthName(month)}',
-                ),
-              ),
-            ],
-          );
-        }),
-        GestureDetector(
-          onTap: () async {
-            countShowSaving++;
-            if (countShowSaving == 5) {
-              await _showSavingAmount(context, nullPricesLevel1);
-              countShowSaving = 0;
-            }
-          },
-          child: HistoryLevelTotalWidget(
-              title: 'TOTAL', uds: totalQuantity, amount: totalAmount, isLastTotal: true),
-        )
-      ],
-    );
-  }
-
-  Future<dynamic> _showSavingAmount(BuildContext context, List<ShoppingHistory> nullPrices) {
-    final double savingAmount = nullPrices.fold(
-      0.0,
-      (sum, line) => sum + line.quantity * mainProvider.getProductPrice(line.product, line.shop),
-    );
-    Map<Product, int> mapProducts = {};
-    for (ShoppingHistory his in nullPrices) {
-      mapProducts.putIfAbsent(
-          his.product,
-          () => nullPrices
-              .where((h) => h.product.id == his.product.id)
-              .fold(0, (previousValue, element) => previousValue + element.quantity));
-    }
-    return showModalBottomSheet(
-      context: context,
-      builder: (context) {
-        return Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-              color: Utils.claro,
-              borderRadius:
-                  BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))),
-          child: SingleChildScrollView(
-            physics: const BouncingScrollPhysics(),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ...mapProducts.entries.map(
-                  (e) {
-                    Product line = e.key;
-                    double newPrice =
-                        mainProvider.getProductPrice(line, widget.shoppingHistory[0].shop);
-                    double totalLine = e.value * newPrice;
-                    return Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        splashColor: Utils.oscuro,
-                        borderRadius: BorderRadius.circular(20),
-                        onTap: () =>
-                            Navigator.pushNamed(context, ProductPage.routeName, arguments: line),
-                        child: Container(
-                          margin: const EdgeInsets.only(bottom: 3),
-                          child: Row(
-                            children: [
-                              Image(image: line.imageType.image(), width: 20, height: 20),
-                              const SizedBox(width: 7),
-                              Expanded(
-                                child: MarqueeWidget(
-                                    child: Text(
-                                        line.name +
-                                            (line.details.isNotEmpty ? ' (${line.details})' : ''),
-                                        style: mainProvider.itemStyle)),
-                              ),
-                              Text('${e.value}x', style: mainProvider.itemStyle),
-                              Text("${newPrice.toStringAsFixed(2)}=",
-                                  style: mainProvider.itemStyle),
-                              Text(
-                                '${totalLine.toStringAsFixed(2)}€',
+    int countShowSaving = 0;
+    final totalQuantityYear =
+        widget.shoppingHistory.fold<int>(0, (sum, item) => sum + item.quantity);
+    double totalYear = widget.shoppingHistory.fold(0, (pre, s) => pre + (s.price * s.quantity));
+    return SliverMainAxisGroup(
+      slivers: [
+        SliverList.separated(
+          itemCount: months.length,
+          itemBuilder: (context, index) {
+            final List<ShoppingHistory> month =
+                widget.shoppingHistory.where((s) => s.date.month == months[index]).toList();
+            final totalQuantityMonth = month.fold<int>(0, (sum, item) => sum + item.quantity);
+            double totalMonth = month.fold(0, (pre, s) => pre + (s.price * s.quantity));
+            final days = month.map((h) => h.date.day).toSet().toList()
+              ..sort((a, b) => b.compareTo(a));
+            int selectedDay = days[0];
+            return StatefulBuilder(
+              builder: (BuildContext context, setState) {
+                final List<ShoppingHistory> day = widget.shoppingHistory
+                    .where((s) => s.date.month == months[index] && s.date.day == selectedDay)
+                    .toList();
+                final totalQuantityDay = day.fold<int>(0, (sum, item) => sum + item.quantity);
+                final totalPriceDay = day.fold<double>(
+                  0,
+                  (sum, item) => sum + (item.quantity * item.price),
+                );
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: Utils.oscuro.withAlpha(100),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Utils.claro),
+                  ),
+                  child: ExpansionTile(
+                    tilePadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(20)),
+                    collapsedShape:
+                        RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(20)),
+                    childrenPadding: EdgeInsets.all(10),
+                    title:
+                        //CABECERA
+                        Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          Utils.monthName(months[index]),
+                          style: mainProvider.minititleStyle.copyWith(color: Utils.claro),
+                        ),
+                        Text(
+                          '${totalMonth.toStringAsFixed(2)} €',
+                          style: mainProvider.minititleStyle.copyWith(color: Utils.claro),
+                        ),
+                      ],
+                    ),
+                    children: [
+                      //DIAS DE COMPRA DEL MES
+                      SizedBox(
+                        height: 20,
+                        child: ListView.separated(
+                          physics: const BouncingScrollPhysics(),
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          itemCount: days.length,
+                          itemBuilder: (context, index2) {
+                            return GestureDetector(
+                              onTap: () => setState(() => selectedDay = days[index2]),
+                              child: Text(
+                                '${days[index2].toString().padLeft(2, '0')}-${months[index].toString().padLeft(2, '0')}-${widget.shoppingHistory[0].date.year}',
                                 style: mainProvider.itemStyle.copyWith(
-                                    color: totalLine == 0
-                                        ? Colors.red[800]!.withAlpha(175)
-                                        : Utils.oscuro),
+                                    color: days[index2] == selectedDay ? Utils.claro : Utils.medio),
                               ),
-                            ],
-                          ),
+                            );
+                          },
+                          separatorBuilder: (BuildContext context, int index) =>
+                              const SizedBox(width: 30),
                         ),
                       ),
-                    );
-                  },
-                ),
-                Divider(color: Utils.oscuro),
-                Text('El importe ahorrado es:  ${savingAmount.toStringAsFixed(2)}€',
-                    style: mainProvider.titleStyle.copyWith(fontSize: 20)),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _dayDetail(int day, List<ShoppingHistory> histMonth) {
-    final histDay = histMonth.where((h) => h.date.day == day).toList();
-    histDay.sort((a, b) => a.order.compareTo(b.order));
-    final totalQuantityDay = histDay.fold<int>(0, (sum, item) => sum + item.quantity);
-    final totalPriceDay = histDay.fold<double>(
-      0,
-      (sum, item) => sum + (item.quantity * item.price),
-    );
-    return HistoryLevel3Widget(
-      expansionTitle:
-          _level3Header(Utils.dateEnglishToSpanish(histDay[0].date.toString(), showTime: false)),
-      children: [
-        ...histDay.map(
-          (h) {
-            return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 2),
-              child: InkWell(
-                splashColor: Utils.oscuro,
-                borderRadius: BorderRadius.circular(20),
-                onTap: () =>
-                    Navigator.pushNamed(context, ProductPage.routeName, arguments: h.product),
-                child: Row(
-                  children: [
-                    Image(image: h.product.imageType.image(), width: 20, height: 20),
-                    const SizedBox(width: 7),
-                    Expanded(
-                      child:
-                          MarqueeWidget(child: Text(h.product.name, style: mainProvider.itemStyle)),
-                    ),
-                    Text('${h.quantity}x', style: mainProvider.itemStyle),
-                    Text(h.price.toStringAsFixed(2), style: mainProvider.itemStyle),
-                    Text('= ${(h.quantity * h.price).toStringAsFixed(2)}€',
-                        style: mainProvider.itemStyle),
-                  ],
-                ),
-              ),
+                      Divider(color: Utils.medio),
+                      //DETALLE DE COMPRA DEL DIA SELECCIONADO
+                      ListView.builder(
+                        physics: const BouncingScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: day.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2),
+                            child: InkWell(
+                              splashColor: Utils.oscuro,
+                              borderRadius: BorderRadius.circular(20),
+                              onTap: () => Navigator.pushNamed(context, ProductPage.routeName,
+                                  arguments: day[index].product),
+                              child: Row(
+                                children: [
+                                  Image(
+                                      image: day[index].product.imageType.image(),
+                                      width: 20,
+                                      height: 20),
+                                  const SizedBox(width: 7),
+                                  Expanded(
+                                    child: MarqueeWidget(
+                                        child: Text(day[index].product.name,
+                                            style: mainProvider.itemStyle
+                                                .copyWith(color: Utils.claro))),
+                                  ),
+                                  Text('${day[index].quantity}x',
+                                      style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
+                                  Text(day[index].price.toStringAsFixed(2),
+                                      style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
+                                  Text(
+                                      '= ${(day[index].quantity * day[index].price).toStringAsFixed(2)}€',
+                                      style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 8),
+                      //TOTAL DEL DIA SELECCIONADO
+                      GestureDetector(
+                        onTap: () async {
+                          countShowSaving++;
+                          if (countShowSaving == 3) {
+                            await showSavingAmount(context, mainProvider, day[0].shop,
+                                day.where((s) => s.price == 0).toList());
+                            countShowSaving = 0;
+                          }
+                        },
+                        child: HistoryLevelTotalWidget(
+                          action: InkWell(
+                            borderRadius: BorderRadius.circular(20),
+                            onTap: () => Navigator.pushNamed(context, HistoryDetailPage.routeName,
+                                arguments: day),
+                            child: Icon(Icons.edit, color: Utils.medio),
+                          ),
+                          uds: totalQuantityDay,
+                          amount: totalPriceDay,
+                          title: 'Total día',
+                          isLastTotal: false,
+                        ),
+                      ),
+                      Divider(color: Utils.medio),
+                      //TOTAL DEL MES ACTUAL
+                      GestureDetector(
+                        onTap: () async {
+                          countShowSaving++;
+                          if (countShowSaving == 5) {
+                            await showSavingAmount(context, mainProvider, month[0].shop,
+                                month.where((s) => s.price == 0).toList());
+                            countShowSaving = 0;
+                          }
+                        },
+                        child: HistoryLevelTotalWidget(
+                            title: 'TOTAL MES',
+                            uds: totalQuantityMonth,
+                            amount: totalMonth,
+                            isLastTotal: true),
+                      ),
+                    ],
+                  ),
+                );
+              },
             );
           },
+          separatorBuilder: (context, index) => const SizedBox(height: 10),
         ),
-        const SizedBox(height: 8),
-        HistoryLevelTotalWidget(
-          action: InkWell(
-            borderRadius: BorderRadius.circular(20),
-            onTap: () =>
-                Navigator.pushNamed(context, HistoryDetailPage.routeName, arguments: histDay),
-            child: Icon(Icons.edit, color: Utils.medio),
-          ),
-          uds: totalQuantityDay,
-          amount: totalPriceDay,
-          title: 'Total:',
-        ),
-      ],
-    );
-  }
-
-  Widget _level3Header(String histDay) {
-    return Row(
-      children: [
-        Icon(Icons.calendar_month, color: Utils.oscuro.withAlpha((255 * 0.8).toInt())),
-        const SizedBox(width: 6),
-        Text(
-          histDay,
-          style: mainProvider.itemStyle.copyWith(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-            color: Utils.oscuro,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _level2Header(int month) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [Utils.medio.withAlpha(250), Utils.oscuro.withAlpha(210)],
-        ),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Text(
-        Utils.monthName(month),
-        style: mainProvider.minititleStyle.copyWith(
-          color: Colors.white,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-    );
-  }
-
-  Widget _level1Header() {
-    return Row(
-      children: [
-        Icon(Icons.calendar_month),
-        const SizedBox(width: 12),
-        Expanded(
-          child: MarqueeWidget(
-            child: Text(
-              widget.shoppingHistory[0].date.year.toString(),
-              style: mainProvider.mainTitleStyle.copyWith(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Utils.oscuro,
-              ),
+        //TOTAL AÑO
+        SliverToBoxAdapter(
+          child: Container(
+            padding: const EdgeInsets.only(right: 10, left: 10, top: 20, bottom: 10),
+            child: GestureDetector(
+              onTap: () async {
+                countShowSaving++;
+                if (countShowSaving == 5) {
+                  await showSavingAmount(context, mainProvider, widget.shoppingHistory[0].shop,
+                      widget.shoppingHistory.where((s) => s.price == 0).toList());
+                  countShowSaving = 0;
+                }
+              },
+              child: HistoryLevelTotalWidget(
+                  title: 'TOTAL AÑO',
+                  uds: totalQuantityYear,
+                  amount: totalYear,
+                  isLastTotal: false),
             ),
           ),
         ),

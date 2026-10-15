@@ -736,3 +736,16 @@ extension EAscDescExtension on EAscDesc {
     }
   }
 }
+
+enum EGraphicProductShow { quantity, price }
+
+extension EGraphicProductShowExtension on EGraphicProductShow {
+  String get displayName {
+    switch (this) {
+      case EGraphicProductShow.quantity:
+        return 'Cantidad';
+      case EGraphicProductShow.price:
+        return 'Precio';
+    }
+  }
+}

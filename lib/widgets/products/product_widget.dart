@@ -51,8 +51,9 @@ class _ProductWidgetState extends State<ProductWidget> {
           padding: const EdgeInsets.all(10),
           margin: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Utils.claro.withAlpha(isMoving ? 100 : 255),
+            color: Utils.oscuro.withAlpha(100),
             borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Utils.claro),
           ),
           child: Stack(
             children: [
@@ -70,7 +71,7 @@ class _ProductWidgetState extends State<ProductWidget> {
                             (widget.product.details.isNotEmpty
                                 ? ' (${widget.product.details})'
                                 : ''),
-                        style: mainProvider.titleStyle.copyWith(fontSize: 13),
+                        style: mainProvider.titleStyle.copyWith(fontSize: 13, color: Utils.claro),
                       ),
                     ),
                   ],

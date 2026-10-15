@@ -11,6 +11,7 @@ class HistoryTotalShoppingWidget extends StatelessWidget {
   final List<ShoppingHistory> shoppingHistory;
   const HistoryTotalShoppingWidget({super.key, required this.shoppingHistory});
 
+  //OPTIMIZADO PARA VER DESDE EL HISTORICO
   @override
   Widget build(BuildContext context) {
     MainProvider mainProvider = Provider.of(context);
@@ -29,12 +30,13 @@ class HistoryTotalShoppingWidget extends StatelessWidget {
           child: FadeInLeft(
             delay: Duration(milliseconds: 20 * index),
             child: Container(
-              margin: const EdgeInsets.only(bottom: 10, left: 10, right: 10),
-              padding: const EdgeInsets.all(10),
+              margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
               decoration: BoxDecoration(
-                color: Utils.claro,
+                color: Utils.oscuro.withAlpha(100),
                 borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Utils.claro),
               ),
+              padding: const EdgeInsets.all(10),
               child: Row(
                 children: [
                   Hero(
@@ -46,12 +48,15 @@ class HistoryTotalShoppingWidget extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        MarqueeWidget(child: Text(product.name, style: mainProvider.itemStyle)),
-                        Text('${price.toStringAsFixed(2)}€', style: mainProvider.itemStyle),
+                        MarqueeWidget(
+                            child: Text(product.name,
+                                style: mainProvider.itemStyle.copyWith(color: Utils.claro))),
+                        Text('${price.toStringAsFixed(2)}€',
+                            style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
                       ],
                     ),
                   ),
-                  Text('$total uds', style: mainProvider.itemStyle),
+                  Text('$total uds', style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
                 ],
               ),
             ),

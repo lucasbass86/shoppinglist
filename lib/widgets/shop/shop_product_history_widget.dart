@@ -32,12 +32,9 @@ class _ShopProductHistoryState extends State<ShopProductHistory> {
         margin: const EdgeInsets.all(10),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: Utils.claro,
+          color: Utils.oscuro.withAlpha(100),
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: Utils.oscuro,
-            width: 1,
-          ),
+          border: Border.all(color: Utils.claro),
         ),
         child: Column(
           children: [
@@ -46,7 +43,8 @@ class _ShopProductHistoryState extends State<ShopProductHistory> {
               spacing: 10,
               children: [
                 Image(image: widget.product.imageType.image(), width: 30, height: 30),
-                Text(widget.product.name, style: mainProvider.itemStyle.copyWith(fontSize: 23)),
+                Text(widget.product.name,
+                    style: mainProvider.itemStyle.copyWith(fontSize: 23, color: Utils.claro)),
               ],
             ),
             const SizedBox(height: 10),
@@ -85,8 +83,7 @@ class _ShopProductHistoryState extends State<ShopProductHistory> {
             yValueMapper: (_Graphic hist, _) => hist.historicoPrecio.productShop.price,
             name: g.shop.name,
             legendItemText: g.shop.name,
-            dataLabelSettings:
-                DataLabelSettings(isVisible: true, color: mainProvider.itemStyle.color),
+            dataLabelSettings: DataLabelSettings(isVisible: true, color: Utils.claro),
             onPointLongPress: (pointInteractionDetails) {
               final List<_Graphic> actual =
                   graf.elementAt(pointInteractionDetails.seriesIndex!).dataSource as List<_Graphic>;
@@ -115,8 +112,7 @@ class _ShopProductHistoryState extends State<ShopProductHistory> {
             yValueMapper: (_Graphic hist, _) => hist.historicoPrecio.productShop.price,
             name: g.shop.name,
             legendItemText: g.shop.name,
-            dataLabelSettings:
-                DataLabelSettings(isVisible: true, color: mainProvider.itemStyle.color),
+            dataLabelSettings: DataLabelSettings(isVisible: true, color: Utils.claro),
             markerSettings: const MarkerSettings(isVisible: true),
             onPointLongPress: (pointInteractionDetails) {
               final _Graphic otro = g.list[pointInteractionDetails.pointIndex!];
@@ -142,21 +138,20 @@ class _ShopProductHistoryState extends State<ShopProductHistory> {
     return SfCartesianChart(
       primaryXAxis: CategoryAxis(
         labelRotation: 45,
-        labelStyle: TextStyle(fontSize: 10, color: Utils.oscuro),
-        majorGridLines: MajorGridLines(color: Utils.oscuro),
-        // minorGridLines: MinorGridLines(color: Utils.oscuro),
-        axisLine: AxisLine(color: Utils.oscuro),
+        labelStyle: TextStyle(fontSize: 10, color: Utils.claro),
+        majorGridLines: MajorGridLines(color: Utils.claro),
+        axisLine: AxisLine(color: Utils.claro),
         axisLabelFormatter: (details) {
           final fechaEsp = Utils.dateEnglishToSpanish(details.text, showTime: false);
           return ChartAxisLabel(fechaEsp, details.textStyle);
         },
       ),
       primaryYAxis: NumericAxis(
-        labelStyle: TextStyle(fontSize: 12, color: Utils.oscuro),
+        labelStyle: TextStyle(fontSize: 12, color: Utils.claro),
         labelFormat: '{value}€',
-        majorGridLines: MajorGridLines(color: Utils.oscuro),
-        minorGridLines: MinorGridLines(color: Utils.oscuro),
-        axisLine: AxisLine(color: Utils.oscuro),
+        majorGridLines: MajorGridLines(color: Utils.claro),
+        minorGridLines: MinorGridLines(color: Utils.claro),
+        axisLine: AxisLine(color: Utils.claro),
       ),
       tooltipBehavior: TooltipBehavior(enable: true),
       series: graf,

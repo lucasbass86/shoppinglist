@@ -7,7 +7,8 @@ class MenuProductRightActionWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final double size = Utils.productImageSize <= Utils.productImageSizeStandar ? 35 : 60;
+    // final double size = Utils.productImageSize <= Utils.productImageSizeStandar ? 35 : 40;
+    final double size = 42.195;
     return Container(
       width: size,
       height: size,

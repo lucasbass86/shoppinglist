@@ -106,95 +106,102 @@ class _HistoryPageState extends State<HistoryPage> {
     return SliverToBoxAdapter(
       child: FadeInLeft(
         child: Container(
-          margin: const EdgeInsets.all(10),
-          child: Card(
-            color: Utils.claro,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            borderOnForeground: false,
-            elevation: 1,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: ExpansionTile(
-                enabled: typeHistory == ETypeHistory.shoppings,
-                iconColor: Utils.medio,
-                collapsedIconColor: Utils.medio,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                childrenPadding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
-                title: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
+          // margin: const EdgeInsets.all(10),
+          margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+          padding: const EdgeInsets.only(bottom: 10),
+          decoration: BoxDecoration(
+            color: Utils.oscuro.withAlpha(100),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Utils.claro),
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: ExpansionTile(
+              enabled: typeHistory == ETypeHistory.shoppings,
+              iconColor: Utils.claro,
+              collapsedIconColor: Utils.claro,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              childrenPadding: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+              title: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  DropdownButton(
+                    borderRadius: BorderRadius.circular(20),
+                    dropdownColor: Utils.oscuro,
+                    iconEnabledColor: Utils.claro,
+                    isExpanded: false,
+                    value: typeHistory,
+                    underline: Container(),
+                    items: ETypeHistory.values
+                        .map<DropdownMenuItem<ETypeHistory>>((ETypeHistory value) {
+                      return DropdownMenuItem<ETypeHistory>(
+                        value: value,
+                        child: Text(value.displayName(),
+                            style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
+                      );
+                    }).toList(),
+                    onChanged: <ETypeHistory>(value) {
+                      setState(() {
+                        typeHistory = value;
+                        Preferences.typeHistory = typeHistory;
+                      });
+                    },
+                  ),
+                  if (typeHistory == ETypeHistory.prices)
                     DropdownButton(
                       borderRadius: BorderRadius.circular(20),
-                      dropdownColor: Utils.claro,
+                      dropdownColor: Utils.oscuro,
+                      iconEnabledColor: Utils.claro,
                       isExpanded: false,
-                      value: typeHistory,
+                      value: typePrices,
                       underline: Container(),
-                      items: ETypeHistory.values
-                          .map<DropdownMenuItem<ETypeHistory>>((ETypeHistory value) {
-                        return DropdownMenuItem<ETypeHistory>(
+                      items: ETypePrices.values
+                          .map<DropdownMenuItem<ETypePrices>>((ETypePrices value) {
+                        return DropdownMenuItem<ETypePrices>(
                           value: value,
-                          child: Text(value.displayName(), style: mainProvider.itemStyle),
+                          child: Text(value.displayName(),
+                              style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
                         );
                       }).toList(),
-                      onChanged: <ETypeHistory>(value) {
+                      onChanged: <ETypePrices>(value) {
                         setState(() {
-                          typeHistory = value;
-                          Preferences.typeHistory = typeHistory;
+                          typePrices = value;
+                          Preferences.typePrices = typePrices;
                         });
                       },
                     ),
-                    if (typeHistory == ETypeHistory.prices)
-                      DropdownButton(
-                        borderRadius: BorderRadius.circular(20),
-                        dropdownColor: Utils.claro,
-                        isExpanded: false,
-                        value: typePrices,
-                        underline: Container(),
-                        items: ETypePrices.values
-                            .map<DropdownMenuItem<ETypePrices>>((ETypePrices value) {
-                          return DropdownMenuItem<ETypePrices>(
-                            value: value,
-                            child: Text(value.displayName(), style: mainProvider.itemStyle),
-                          );
-                        }).toList(),
-                        onChanged: <ETypePrices>(value) {
-                          setState(() {
-                            typePrices = value;
-                            Preferences.typePrices = typePrices;
-                          });
-                        },
-                      ),
-                    if (typeHistory == ETypeHistory.shoppings)
-                      DropdownButton(
-                        borderRadius: BorderRadius.circular(20),
-                        dropdownColor: Utils.claro,
-                        isExpanded: false,
-                        value: typeShoppings,
-                        underline: Container(),
-                        items: ETypeShoppings.values
-                            .map<DropdownMenuItem<ETypeShoppings>>((ETypeShoppings value) {
-                          return DropdownMenuItem<ETypeShoppings>(
-                            value: value,
-                            child: Text(value.displayName(), style: mainProvider.itemStyle),
-                          );
-                        }).toList(),
-                        onChanged: <ETypeShoppings>(value) {
-                          setState(() {
-                            typeShoppings = value;
-                            Preferences.typeShoppings = typeShoppings;
-                          });
-                        },
-                      ),
-                  ],
-                ),
-                children: [
-                  if (typeShoppings == ETypeShoppings.nogroup) _order(),
-                  _shops(),
-                  _dates(),
-                  _search(),
-                  _totalPrice(),
+                  if (typeHistory == ETypeHistory.shoppings)
+                    DropdownButton(
+                      borderRadius: BorderRadius.circular(20),
+                      dropdownColor: Utils.oscuro,
+                      iconEnabledColor: Utils.claro,
+                      isExpanded: false,
+                      value: typeShoppings,
+                      underline: Container(),
+                      items: ETypeShoppings.values
+                          .map<DropdownMenuItem<ETypeShoppings>>((ETypeShoppings value) {
+                        return DropdownMenuItem<ETypeShoppings>(
+                          value: value,
+                          child: Text(value.displayName(),
+                              style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
+                        );
+                      }).toList(),
+                      onChanged: <ETypeShoppings>(value) {
+                        setState(() {
+                          typeShoppings = value;
+                          Preferences.typeShoppings = typeShoppings;
+                        });
+                      },
+                    ),
                 ],
               ),
+              children: [
+                if (typeShoppings == ETypeShoppings.nogroup) _order(),
+                _shops(),
+                _dates(),
+                _search(),
+                _totalPrice(),
+              ],
             ),
           ),
         ),
@@ -215,22 +222,22 @@ class _HistoryPageState extends State<HistoryPage> {
                 margin: const EdgeInsets.all(10),
                 width: _isSearchExpanded ? constraints.maxWidth : 50,
                 decoration: BoxDecoration(
-                  color: Colors.white54,
-                  borderRadius: BorderRadius.circular(20),
-                ),
+                    // color: Colors.white54,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Utils.claro)),
                 child: TextField(
                   controller: controller,
                   maxLength: 20,
                   onChanged: (value) => _filterHistory(),
                   onTapOutside: (event) => FocusScope.of(context).unfocus(),
-                  style: mainProvider.itemStyle,
+                  style: mainProvider.itemStyle.copyWith(color: Utils.claro),
                   decoration: InputDecoration(
                     border: border,
-                    enabledBorder: border,
-                    focusedBorder: border,
+                    // enabledBorder: border,
+                    // focusedBorder: border,
                     counterText: '',
                     hintText: 'Buscar',
-                    hintStyle: TextStyle(fontSize: 15.0, color: Utils.medio),
+                    hintStyle: TextStyle(fontSize: 15.0, color: Utils.claro),
                     prefixIcon: GestureDetector(
                       onTap: () {
                         setState(() {
@@ -248,8 +255,8 @@ class _HistoryPageState extends State<HistoryPage> {
                           heightFactor: 2,
                           child: AnimatedCrossFade(
                             secondChild: Icon(Icons.arrow_back_ios_new_rounded,
-                                color: Utils.oscuro, size: 30),
-                            firstChild: Icon(Icons.search, color: Utils.oscuro, size: 30),
+                                color: Utils.claro, size: 30),
+                            firstChild: Icon(Icons.search, color: Utils.claro, size: 30),
                             crossFadeState: !_isSearchExpanded
                                 ? CrossFadeState.showFirst
                                 : CrossFadeState.showSecond,
@@ -270,7 +277,7 @@ class _HistoryPageState extends State<HistoryPage> {
                                 },
                               );
                             },
-                            child: Icon(Icons.close, color: Utils.oscuro),
+                            child: Icon(Icons.close, color: Utils.claro),
                           )
                         : const SizedBox.shrink(),
                   ),
@@ -285,7 +292,7 @@ class _HistoryPageState extends State<HistoryPage> {
             borderRadius: BorderRadius.circular(20),
             onTap: () => Navigator.pushNamed(context, ChartPage.routeName,
                 arguments: [history, startDate, finishDate]),
-            child: Icon(Icons.pie_chart_rounded, color: Utils.oscuro, size: 40),
+            child: Icon(Icons.pie_chart_rounded, color: Utils.claro, size: 40),
           ),
         ),
       ],
@@ -297,9 +304,8 @@ class _HistoryPageState extends State<HistoryPage> {
       margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Utils.claro,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Utils.oscuro),
+        border: Border.all(color: Utils.claro),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -310,7 +316,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   startDate == null
                       ? '--/--/----'
                       : Utils.dateEnglishToSpanish(startDate.toString(), showTime: false),
-                  style: mainProvider.itemStyle),
+                  style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
               const SizedBox(width: 10),
               Material(
                 color: Colors.transparent,
@@ -327,7 +333,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   },
                   child: Icon(
                     Icons.calendar_month_outlined,
-                    color: Utils.oscuro,
+                    color: Utils.claro,
                     size: 30,
                   ),
                 ),
@@ -340,7 +346,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   finishDate == null
                       ? '--/--/----'
                       : Utils.dateEnglishToSpanish(finishDate.toString(), showTime: false),
-                  style: mainProvider.itemStyle),
+                  style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
               const SizedBox(width: 10),
               Material(
                 color: Colors.transparent,
@@ -357,7 +363,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   },
                   child: Icon(
                     Icons.calendar_month_outlined,
-                    color: Utils.oscuro,
+                    color: Utils.claro,
                     size: 30,
                   ),
                 ),
@@ -375,7 +381,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   finishDate = null;
                   _filterHistory();
                 },
-                child: Icon(Icons.close, color: Utils.oscuro, size: 30),
+                child: Icon(Icons.close, color: Utils.claro, size: 30),
               ),
             ),
         ],
@@ -390,24 +396,26 @@ class _HistoryPageState extends State<HistoryPage> {
       margin: const EdgeInsets.all(10),
       padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
-        color: Utils.claro,
+        // color: Utils.claro,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Utils.oscuro),
+        border: Border.all(color: Utils.claro),
       ),
       child: Row(
         children: [
-          Text('Tienda:', style: mainProvider.itemStyle),
+          Text('Tienda:', style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
           Expanded(
             child: DropdownButton(
               borderRadius: BorderRadius.circular(20),
-              dropdownColor: Utils.claro,
+              dropdownColor: Utils.oscuro,
               isExpanded: true,
               underline: Container(),
               value: selectedShop,
               padding: EdgeInsets.only(left: 20),
               items: shops
                   .map((s) => DropdownMenuItem<Shop>(
-                      value: s, child: Text(s.name.toUpperCase(), style: mainProvider.itemStyle)))
+                      value: s,
+                      child: Text(s.name.toUpperCase(),
+                          style: mainProvider.itemStyle.copyWith(color: Utils.claro))))
                   .toList(),
               onChanged: <Shop>(value) {
                 setState(() {
@@ -493,11 +501,13 @@ class _HistoryPageState extends State<HistoryPage> {
       children: [
         Container(
           padding: const EdgeInsets.all(13),
+          margin: const EdgeInsets.only(left: 10),
           decoration: BoxDecoration(
-            color: Utils.claro,
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Text('TOTAL: ${totalPrice.toStringAsFixed(2)}€', style: mainProvider.itemStyle),
+              // color: Utils.claro,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Utils.claro)),
+          child: Text('TOTAL: ${totalPrice.toStringAsFixed(2)}€',
+              style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
         ),
         Material(
           color: Colors.transparent,
@@ -512,7 +522,7 @@ class _HistoryPageState extends State<HistoryPage> {
                 _filterHistory();
               });
             },
-            child: Icon(Icons.delete, size: 40, color: Utils.oscuro),
+            child: Icon(Icons.delete, size: 40, color: Utils.claro),
           ),
         ),
       ],
@@ -580,10 +590,10 @@ class _HistoryPageState extends State<HistoryPage> {
       if (mainProvider.pricesHistory.isNotEmpty) {
         switch (typePrices) {
           case ETypePrices.byShop:
-            return PriceGroupWidget(type: ETypeHistoryGroup.shop);
+            return PriceGroupByShopWidget();
           case ETypePrices.byProduct:
           default:
-            return PriceGroupWidget(type: ETypeHistoryGroup.product);
+            return PriceGroupByProductWidget();
         }
       } else {
         return SliverFillRemaining(

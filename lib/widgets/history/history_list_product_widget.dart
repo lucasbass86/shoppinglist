@@ -12,6 +12,7 @@ class HistoryListProductWidget extends StatelessWidget {
   const HistoryListProductWidget(
       {super.key, required this.historicoCompras, this.canDelete = true, this.isProduct = true});
 
+  //OPTIMIZADO PARA VER DESDE UNA TIENDA
   @override
   Widget build(BuildContext context) {
     MainProvider mainProvider = Provider.of<MainProvider>(context);

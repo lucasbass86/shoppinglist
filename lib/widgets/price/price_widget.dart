@@ -46,9 +46,14 @@ class _PriceWidgetState extends State<PriceWidget> {
                 right: 0,
                 child: Container(
                   padding: const EdgeInsets.only(left: 40, top: 10),
+                  // decoration: BoxDecoration(
+                  //   color: Utils.claro,
+                  //   borderRadius: BorderRadius.circular(20),
+                  // ),
                   decoration: BoxDecoration(
-                    color: Utils.claro,
+                    color: Utils.oscuro.withAlpha(100),
                     borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: Utils.claro),
                   ),
                   child: Row(
                     children: [
@@ -63,7 +68,7 @@ class _PriceWidgetState extends State<PriceWidget> {
                                 widget.isProduct
                                     ? widget.productShop.product.name
                                     : widget.productShop.shop.name,
-                                style: mainProvider.itemStyle,
+                                style: mainProvider.itemStyle.copyWith(color: Utils.claro),
                               ),
                             ),
                             const SizedBox(height: 1),
@@ -71,14 +76,16 @@ class _PriceWidgetState extends State<PriceWidget> {
                               children: [
                                 Text(
                                   widget.productShop.price.toStringAsFixed(2),
-                                  style: mainProvider.itemStyle.copyWith(fontSize: 20),
+                                  style: mainProvider.itemStyle
+                                      .copyWith(fontSize: 20, color: Utils.claro),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 Container(
                                   padding: const EdgeInsets.only(top: 2),
                                   child: Text(
                                     '€',
-                                    style: mainProvider.itemStyle.copyWith(fontSize: 17),
+                                    style: mainProvider.itemStyle
+                                        .copyWith(fontSize: 17, color: Utils.claro),
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
@@ -86,7 +93,8 @@ class _PriceWidgetState extends State<PriceWidget> {
                             ),
                             Text(
                               Utils.dateEnglishToSpanish(widget.productShop.date.toString()),
-                              style: mainProvider.titleStyle.copyWith(fontSize: 13),
+                              style: mainProvider.titleStyle
+                                  .copyWith(fontSize: 13, color: Utils.claro),
                             ),
                           ],
                         ),

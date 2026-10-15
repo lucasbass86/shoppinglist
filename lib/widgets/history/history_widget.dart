@@ -26,12 +26,17 @@ class HistoryProductWidget extends StatelessWidget {
       },
       onLongPress: () => _changeCuantity(context, mainProvider),
       child: Container(
-        // height: 70,
-        margin: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
+        // margin: const EdgeInsets.only(left: 10, right: 10, bottom: 10),
+        // decoration: BoxDecoration(
+        //   color: Utils.claro,
+        //   borderRadius: BorderRadius.circular(20),
+        // ),
         padding: const EdgeInsets.all(10),
+        margin: const EdgeInsets.symmetric(horizontal: 5, vertical: 5),
         decoration: BoxDecoration(
-          color: Utils.claro,
+          color: Utils.oscuro.withAlpha(100),
           borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Utils.claro),
         ),
         child: Row(
           children: [
@@ -56,11 +61,11 @@ class HistoryProductWidget extends StatelessWidget {
                 children: [
                   Text(
                     isProduct ? shoppingHistory.shop.name : shoppingHistory.product.name,
-                    style: mainProvider.titleStyle.copyWith(fontSize: 20),
+                    style: mainProvider.titleStyle.copyWith(fontSize: 20, color: Utils.claro),
                   ),
                   Text(
                     Utils.dateEnglishToSpanish(shoppingHistory.date.toString()),
-                    style: mainProvider.titleStyle.copyWith(fontSize: 13),
+                    style: mainProvider.titleStyle.copyWith(fontSize: 13, color: Utils.claro),
                   ),
                 ],
               ),
@@ -70,11 +75,11 @@ class HistoryProductWidget extends StatelessWidget {
               children: [
                 Text(
                   '${shoppingHistory.quantity} ${shoppingHistory.quantity == 1 ? 'ud' : 'uds'}',
-                  style: mainProvider.titleStyle.copyWith(fontSize: 17),
+                  style: mainProvider.titleStyle.copyWith(fontSize: 17, color: Utils.claro),
                 ),
                 Text(
                   '${shoppingHistory.price.toStringAsFixed(2)}€',
-                  style: mainProvider.titleStyle.copyWith(fontSize: 17),
+                  style: mainProvider.titleStyle.copyWith(fontSize: 17, color: Utils.claro),
                 ),
                 if (shoppingHistory.quantity > 1 && shoppingHistory.price != 0)
                   Column(
@@ -83,11 +88,11 @@ class HistoryProductWidget extends StatelessWidget {
                       Container(
                         height: 1.5,
                         width: 70,
-                        color: Utils.oscuro,
+                        color: Utils.claro,
                       ),
                       Text(
                         '${(shoppingHistory.price * shoppingHistory.quantity).toStringAsFixed(2)}€',
-                        style: mainProvider.titleStyle.copyWith(fontSize: 15),
+                        style: mainProvider.titleStyle.copyWith(fontSize: 15, color: Utils.claro),
                       ),
                     ],
                   )

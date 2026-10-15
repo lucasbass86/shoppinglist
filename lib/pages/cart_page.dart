@@ -34,6 +34,7 @@ class _CartPageState extends State<CartPage> with SingleTickerProviderStateMixin
   bool showNewShop = false;
   late CartProduct deletedCartProduct;
   late ShoppingHistory shoppingHistory;
+  bool showTotalAmount = true;
 
   @override
   void dispose() {
@@ -160,15 +161,7 @@ class _CartPageState extends State<CartPage> with SingleTickerProviderStateMixin
               isExpanded = false;
             });
           },
-          itemBuilder: (_, index) {
-            return Container(
-              decoration: BoxDecoration(
-                color: Utils.claro.withAlpha(100),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: products(mainProvider.cart[index]),
-            );
-          },
+          itemBuilder: (_, index) => products(mainProvider.cart[index]),
         ),
       ),
     );
@@ -278,22 +271,21 @@ class _CartPageState extends State<CartPage> with SingleTickerProviderStateMixin
             padding: const EdgeInsets.all(10),
             margin: const EdgeInsets.only(left: 10),
             decoration: BoxDecoration(
-              color: candidateData.isNotEmpty
-                  ? Utils.medio
-                  : CartPage.shopNameSelected == cart.shop.name
-                      ? Utils.oscuro
-                      : Utils.claro,
+              color: candidateData.isNotEmpty ? Utils.claro : Utils.oscuro.withAlpha(100),
               borderRadius: BorderRadius.circular(20),
               border: Border.all(
-                color: Utils.oscuro,
+                color:
+                    CartPage.shopNameSelected == cart.shop.name ? Utils.claro : Colors.transparent,
                 width: 2,
               ),
             ),
             child: Center(
-              child: Text(cart.shop.name,
-                  style: CartPage.shopNameSelected == cart.shop.name
-                      ? mainProvider.titleStyle.copyWith(color: Utils.claro)
-                      : mainProvider.titleStyle),
+              child: Text(
+                cart.shop.name,
+                style: CartPage.shopNameSelected == cart.shop.name
+                    ? mainProvider.titleStyle.copyWith(color: Utils.claro)
+                    : mainProvider.titleStyle.copyWith(color: Utils.oscuro),
+              ),
             ),
           );
         },
@@ -426,6 +418,7 @@ class _CartPageState extends State<CartPage> with SingleTickerProviderStateMixin
   }
 
   Widget _totalAmount(Cart cart) {
+    if (!showTotalAmount) return SizedBox.shrink();
     return Positioned(
       bottom: 16,
       left: 20,
@@ -435,12 +428,13 @@ class _CartPageState extends State<CartPage> with SingleTickerProviderStateMixin
           child: Container(
             padding: const EdgeInsets.only(bottom: 10, left: 25, top: 10, right: 25),
             decoration: BoxDecoration(
-              color: Utils.claro,
-              borderRadius: BorderRadius.circular(40),
+              color: Utils.oscuro.withAlpha(100),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: Utils.claro),
             ),
             child: Center(
               child: Text('${cart.totalAmount.toStringAsFixed(2)}€',
-                  style: mainProvider.mainTitleStyle),
+                  style: mainProvider.mainTitleStyle.copyWith(color: Utils.claro)),
             ),
           ),
         ),
@@ -449,9 +443,12 @@ class _CartPageState extends State<CartPage> with SingleTickerProviderStateMixin
   }
 
   void _bottomInfo(Cart cart) {
+    showTotalAmount = false;
+    setState(() {});
     List<String> orders = ['Nombre', 'Tipo'];
     String selOrder = 'Nombre';
     showModalBottomSheet(
+      backgroundColor: Colors.transparent,
       context: context,
       builder: (context) {
         return GestureDetector(
@@ -467,25 +464,42 @@ class _CartPageState extends State<CartPage> with SingleTickerProviderStateMixin
               return Container(
                 padding: const EdgeInsets.only(bottom: 10, left: 15, top: 10, right: 15),
                 decoration: BoxDecoration(
-                  color: Utils.claro,
+                  color: Utils.oscuro.withAlpha(100),
                   borderRadius: BorderRadius.circular(20),
+                  // border: Border.all(color: Utils.claro),
+                  border: Border(top: BorderSide(color: Utils.claro)),
                 ),
                 child: Column(
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Listado de ${cart.shop.name}', style: mainProvider.itemStyle),
-                        DropdownButton<String>(
-                          borderRadius: BorderRadius.circular(20),
-                          elevation: 16,
-                          style: TextStyle(fontSize: 17, color: Utils.oscuro),
-                          underline: Container(),
-                          value: selOrder,
-                          items: orders
-                              .map((o) => DropdownMenuItem(value: o, child: Text(o)))
-                              .toList(),
-                          onChanged: (value) => setState(() => selOrder = value!),
+                        Text('Listado de ${cart.shop.name}',
+                            style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          decoration: BoxDecoration(
+                            color: Utils.oscuro.withAlpha(100),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(color: Utils.claro),
+                          ),
+                          child: DropdownButton<String>(
+                            borderRadius: BorderRadius.circular(20),
+                            elevation: 16,
+                            style: TextStyle(fontSize: 17, color: Utils.claro),
+                            underline: Container(),
+                            dropdownColor: Utils.oscuro,
+                            value: selOrder,
+                            items: orders
+                                .map((o) => DropdownMenuItem(
+                                    value: o,
+                                    child: Text(
+                                      o,
+                                      style: TextStyle(color: Utils.claro),
+                                    )))
+                                .toList(),
+                            onChanged: (value) => setState(() => selOrder = value!),
+                          ),
                         )
                       ],
                     ),
@@ -529,7 +543,8 @@ class _CartPageState extends State<CartPage> with SingleTickerProviderStateMixin
                                               (cart.products[index].product.details.isNotEmpty
                                                   ? ' (${cart.products[index].product.details})'
                                                   : ''),
-                                          style: mainProvider.itemStyle),
+                                          style:
+                                              mainProvider.itemStyle.copyWith(color: Utils.claro)),
                                     ),
                                   ),
                                   Expanded(
@@ -541,9 +556,11 @@ class _CartPageState extends State<CartPage> with SingleTickerProviderStateMixin
                                         children: [
                                           Text(
                                               '${cart.products[index].quantity} x ${precio.toStringAsFixed(2)} = ',
-                                              style: mainProvider.itemStyle),
+                                              style: mainProvider.itemStyle
+                                                  .copyWith(color: Utils.claro)),
                                           Text('${total.toStringAsFixed(2)} €',
-                                              style: mainProvider.itemStyle),
+                                              style: mainProvider.itemStyle
+                                                  .copyWith(color: Utils.claro)),
                                         ],
                                       ),
                                     ),
@@ -560,24 +577,17 @@ class _CartPageState extends State<CartPage> with SingleTickerProviderStateMixin
                       child: Container(
                         padding: const EdgeInsets.only(top: 10, bottom: 10, left: 20, right: 20),
                         decoration: BoxDecoration(
-                          color: Utils.oscuro,
+                          color: Utils.oscuro.withAlpha(100),
                           borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Utils.medio,
-                              offset: const Offset(0, 5),
-                              blurRadius: 17,
-                              spreadRadius: 3,
-                            ),
-                          ],
+                          border: Border.all(color: Utils.claro),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text('Total',
-                                style: mainProvider.itemStyle.copyWith(color: Colors.white)),
+                                style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
                             Text('${cart.totalAmount.toStringAsFixed(2)} €',
-                                style: mainProvider.itemStyle.copyWith(color: Colors.white)),
+                                style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
                           ],
                         ),
                       ),
@@ -589,7 +599,7 @@ class _CartPageState extends State<CartPage> with SingleTickerProviderStateMixin
           ),
         );
       },
-    );
+    ).then((_) => setState(() => showTotalAmount = true));
   }
 
   Future<void> _onDeleteItem(

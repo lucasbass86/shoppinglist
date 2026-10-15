@@ -68,51 +68,73 @@ class _ChartAmountPageState extends State<ChartAmountPage> {
       child: Container(
         padding: const EdgeInsets.all(10),
         margin: const EdgeInsets.symmetric(horizontal: 10),
-        decoration: BoxDecoration(color: Utils.claro, borderRadius: BorderRadius.circular(20)),
+        decoration: BoxDecoration(
+          color: Utils.oscuro.withAlpha(100),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: Utils.claro),
+        ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           spacing: 10,
           children: [
-            DropdownButton(
-              borderRadius: BorderRadius.circular(20),
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              dropdownColor: Utils.claro,
-              isExpanded: false,
-              value: selectedShopName,
-              underline: Container(),
-              alignment: Alignment.center,
-              items: names.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value.toUpperCase(), style: mainProvider.itemStyle),
-                );
-              }).toList(),
-              onChanged: <String>(value) {
-                setState(() {
-                  selectedShopName = value;
-                  selectedYear = 'TODOS';
-                });
-              },
+            Container(
+              decoration: BoxDecoration(
+                color: Utils.oscuro.withAlpha(100),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Utils.claro),
+              ),
+              child: DropdownButton(
+                borderRadius: BorderRadius.circular(20),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                dropdownColor: Utils.oscuro,
+                isExpanded: false,
+                value: selectedShopName,
+                underline: Container(),
+                alignment: Alignment.center,
+                iconEnabledColor: Utils.claro,
+                items: names.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value.toUpperCase(),
+                        style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
+                  );
+                }).toList(),
+                onChanged: <String>(value) {
+                  setState(() {
+                    selectedShopName = value;
+                    selectedYear = 'TODOS';
+                  });
+                },
+              ),
             ),
-            DropdownButton(
-              borderRadius: BorderRadius.circular(20),
-              padding: const EdgeInsets.symmetric(horizontal: 10),
-              dropdownColor: Utils.claro,
-              isExpanded: false,
-              value: selectedYear,
-              underline: Container(),
-              alignment: Alignment.center,
-              items: yearsOfDropDown.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value.toUpperCase(), style: mainProvider.itemStyle),
-                );
-              }).toList(),
-              onChanged: <String>(value) {
-                setState(() {
-                  selectedYear = value;
-                });
-              },
+            Container(
+              decoration: BoxDecoration(
+                color: Utils.oscuro.withAlpha(100),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Utils.claro),
+              ),
+              child: DropdownButton(
+                borderRadius: BorderRadius.circular(20),
+                padding: const EdgeInsets.symmetric(horizontal: 15),
+                dropdownColor: Utils.oscuro,
+                iconEnabledColor: Utils.claro,
+                isExpanded: false,
+                value: selectedYear,
+                underline: Container(),
+                alignment: Alignment.center,
+                items: yearsOfDropDown.map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value.toUpperCase(),
+                        style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
+                  );
+                }).toList(),
+                onChanged: <String>(value) {
+                  setState(() {
+                    selectedYear = value;
+                  });
+                },
+              ),
             ),
           ],
         ),
@@ -173,7 +195,8 @@ class _ChartAmountPageState extends State<ChartAmountPage> {
           xValueMapper: (_PieDataShops data, _) => data.shopName,
           yValueMapper: (_PieDataShops data, _) => data.quantity,
           dataLabelMapper: (_PieDataShops data, _) => '${data.quantity.toStringAsFixed(2)}€',
-          dataLabelSettings: DataLabelSettings(isVisible: true, textStyle: mainProvider.itemStyle),
+          dataLabelSettings: DataLabelSettings(
+              isVisible: true, textStyle: mainProvider.itemStyle.copyWith(color: Utils.claro)),
           markerSettings: MarkerSettings(isVisible: true),
         ),
         LineSeries<_PieDataShops, String>(
@@ -183,7 +206,7 @@ class _ChartAmountPageState extends State<ChartAmountPage> {
           yValueMapper: (_PieDataShops data, _) => media,
           markerSettings: MarkerSettings(isVisible: true, shape: DataMarkerType.diamond),
           dataLabelMapper: (_PieDataShops data, _) => '${media.toStringAsFixed(2)}€',
-          color: Utils.oscuro,
+          color: Utils.claro,
         ),
       ];
     }
@@ -230,7 +253,8 @@ class _ChartAmountPageState extends State<ChartAmountPage> {
           xValueMapper: (_PieDataShopYears data, _) => data.year,
           yValueMapper: (_PieDataShopYears data, _) => data.quantity,
           dataLabelMapper: (_PieDataShopYears data, _) => '${data.quantity.toStringAsFixed(2)}€',
-          dataLabelSettings: DataLabelSettings(isVisible: true, textStyle: mainProvider.itemStyle),
+          dataLabelSettings: DataLabelSettings(
+              isVisible: true, textStyle: mainProvider.itemStyle.copyWith(color: Utils.claro)),
           markerSettings: MarkerSettings(isVisible: true),
         ),
         LineSeries<_PieDataShopYears, String>(
@@ -240,8 +264,7 @@ class _ChartAmountPageState extends State<ChartAmountPage> {
           yValueMapper: (_PieDataShopYears data, _) => media,
           markerSettings: MarkerSettings(isVisible: true, shape: DataMarkerType.diamond),
           dataLabelMapper: (_PieDataShopYears data, _) => '${media.toStringAsFixed(2)}€',
-          // dataLabelSettings: DataLabelSettings(isVisible: true, textStyle: mainProvider.itemStyle),
-          color: Utils.oscuro,
+          color: Utils.claro,
         ),
       ];
     }
@@ -286,7 +309,8 @@ class _ChartAmountPageState extends State<ChartAmountPage> {
           xValueMapper: (_PieDataShopYear data, _) => data.shortName,
           yValueMapper: (_PieDataShopYear data, _) => data.quantity,
           dataLabelMapper: (_PieDataShopYear data, _) => '${data.quantity.toStringAsFixed(2)}€',
-          dataLabelSettings: DataLabelSettings(isVisible: true, textStyle: mainProvider.itemStyle),
+          dataLabelSettings: DataLabelSettings(
+              isVisible: true, textStyle: mainProvider.itemStyle.copyWith(color: Utils.claro)),
           markerSettings: MarkerSettings(isVisible: true),
         ),
         LineSeries<_PieDataShopYear, String>(
@@ -296,7 +320,7 @@ class _ChartAmountPageState extends State<ChartAmountPage> {
           yValueMapper: (_PieDataShopYear data, _) => media,
           markerSettings: MarkerSettings(isVisible: true, shape: DataMarkerType.diamond),
           dataLabelMapper: (_PieDataShopYear data, _) => '${media.toStringAsFixed(2)}€',
-          color: Utils.oscuro,
+          color: Utils.claro,
         ),
       ];
     }
@@ -307,18 +331,22 @@ class _ChartAmountPageState extends State<ChartAmountPage> {
         child: Container(
           margin: const EdgeInsets.all(10),
           padding: const EdgeInsets.all(5),
-          decoration: BoxDecoration(color: Utils.claro, borderRadius: BorderRadius.circular(20)),
+          decoration: BoxDecoration(
+            color: Utils.oscuro.withAlpha(100),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Utils.claro),
+          ),
           child: RepaintBoundary(
             child: SfCartesianChart(
               primaryXAxis: CategoryAxis(
                 labelRotation: 45,
-                labelStyle: mainProvider.itemStyle.copyWith(fontSize: 13),
+                labelStyle: mainProvider.itemStyle.copyWith(fontSize: 13, color: Utils.claro),
               ),
               primaryYAxis: NumericAxis(
                 minimum: 0,
                 labelFormat: '{value}€',
                 numberFormat: NumberFormat.decimalPatternDigits(decimalDigits: 0),
-                labelStyle: mainProvider.itemStyle.copyWith(fontSize: 13),
+                labelStyle: mainProvider.itemStyle.copyWith(fontSize: 13, color: Utils.claro),
               ),
               legend: Legend(isVisible: false),
               tooltipBehavior: TooltipBehavior(enable: true),

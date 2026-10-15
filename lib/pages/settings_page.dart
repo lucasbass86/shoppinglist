@@ -79,7 +79,7 @@ class _SettingsPageState extends State<SettingsPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Tema', style: mainProvider.titleStyle.copyWith(fontSize: 20)),
+        Text('Tema', style: mainProvider.titleStyle.copyWith(fontSize: 20, color: Utils.claro)),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
@@ -213,7 +213,8 @@ class _SettingsPageState extends State<SettingsPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('Ordenar tiendas', style: mainProvider.titleStyle.copyWith(fontSize: 20)),
+        Text('Ordenar tiendas',
+            style: mainProvider.titleStyle.copyWith(fontSize: 20, color: Utils.claro)),
         SizedBox(
           width: 130,
           child: DropdownButton(
@@ -285,7 +286,8 @@ class _SettingsPageState extends State<SettingsPage> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text('Días de previsión', style: mainProvider.titleStyle.copyWith(fontSize: 20)),
+        Text('Días de previsión',
+            style: mainProvider.titleStyle.copyWith(fontSize: 20, color: Utils.claro)),
         SizedBox(
           width: 100,
           child: DropdownButton(
@@ -344,7 +346,8 @@ class _SettingsPageState extends State<SettingsPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text('Previsión al iniciar', style: mainProvider.titleStyle.copyWith(fontSize: 20)),
+          Text('Previsión al iniciar',
+              style: mainProvider.titleStyle.copyWith(fontSize: 20, color: Utils.claro)),
           Switch(
             value: Preferences.showForecastOnRun,
             onChanged: (value) {
@@ -380,7 +383,8 @@ class _SettingsPageState extends State<SettingsPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text('Deshacer carrito', style: mainProvider.titleStyle.copyWith(fontSize: 20)),
+          Text('Deshacer carrito',
+              style: mainProvider.titleStyle.copyWith(fontSize: 20, color: Utils.claro)),
           Switch(
             value: Preferences.deshacer,
             onChanged: (value) {
@@ -400,7 +404,8 @@ class _SettingsPageState extends State<SettingsPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text('Avisar precio más barato', style: mainProvider.titleStyle.copyWith(fontSize: 20)),
+          Text('Avisar precio más barato',
+              style: mainProvider.titleStyle.copyWith(fontSize: 20, color: Utils.claro)),
           Switch(
             value: mainProvider.avisoBarato,
             onChanged: (value) {
@@ -420,7 +425,8 @@ class _SettingsPageState extends State<SettingsPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text('Al añadir, borrar busqueda', style: mainProvider.titleStyle.copyWith(fontSize: 20)),
+          Text('Al añadir, borrar busqueda',
+              style: mainProvider.titleStyle.copyWith(fontSize: 20, color: Utils.claro)),
           Switch(
             value: mainProvider.borrarBusqueda,
             onChanged: (value) {
@@ -450,21 +456,22 @@ class _SettingsPageState extends State<SettingsPage> {
     return FadeIn(
         duration: Utils.fadeInDuration,
         child: ExpansionTile(
-          title: Text('Borrar datos', style: mainProvider.titleStyle),
-          backgroundColor: Utils.claro,
+          title: Text('Borrar datos', style: mainProvider.titleStyle.copyWith(color: Utils.claro)),
+          // backgroundColor: Utils.claro,
           childrenPadding: const EdgeInsets.all(20),
           collapsedShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           collapsedIconColor: Utils.oscuro,
           iconColor: Utils.oscuro,
-          collapsedBackgroundColor: Utils.claro,
+          // collapsedBackgroundColor: Utils.claro,
           children: [
             ZoomIn(
               delay: const Duration(milliseconds: 50),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Borrar carrito', style: mainProvider.titleStyle.copyWith(fontSize: 20)),
+                  Text('Borrar carrito',
+                      style: mainProvider.titleStyle.copyWith(fontSize: 20, color: Utils.claro)),
                   GestureDetector(
                     onTap: () => _deleteCart(context),
                     child: Container(
@@ -491,7 +498,8 @@ class _SettingsPageState extends State<SettingsPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Borrar precios', style: mainProvider.titleStyle.copyWith(fontSize: 20)),
+                  Text('Borrar precios',
+                      style: mainProvider.titleStyle.copyWith(fontSize: 20, color: Utils.claro)),
                   GestureDetector(
                     onTap: () => _deletePrices(context),
                     child: Container(
@@ -518,7 +526,8 @@ class _SettingsPageState extends State<SettingsPage> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Borrar histórico', style: mainProvider.titleStyle.copyWith(fontSize: 20)),
+                  Text('Borrar histórico',
+                      style: mainProvider.titleStyle.copyWith(fontSize: 20, color: Utils.claro)),
                   GestureDetector(
                     onTap: () => _deleteHistory(context),
                     child: Container(
@@ -546,7 +555,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text('Borrar todos los datos',
-                      style: mainProvider.titleStyle.copyWith(fontSize: 20)),
+                      style: mainProvider.titleStyle.copyWith(fontSize: 20, color: Utils.claro)),
                   GestureDetector(
                     onTap: () => _deleteAll(context),
                     child: Container(
@@ -577,7 +586,8 @@ class _SettingsPageState extends State<SettingsPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Licencia: ${Preferences.license}', style: mainProvider.itemStyle),
+          Text('Licencia: ${Preferences.license}',
+              style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
           Divider(color: Utils.oscuro),
           _version(),
         ],
@@ -594,8 +604,10 @@ class _SettingsPageState extends State<SettingsPage> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Versión: ${packageInfo.version}', style: mainProvider.itemStyle),
-              Text('Actualizada el 26/05/2025', style: mainProvider.itemStyle),
+              Text('Versión: ${packageInfo.version}',
+                  style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
+              Text('Actualizada el 26/05/2025',
+                  style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
             ],
           );
         } else {
@@ -617,8 +629,9 @@ class _SettingsPageState extends State<SettingsPage> {
               width: double.infinity,
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Utils.claro,
+                color: Utils.oscuro.withAlpha(100),
                 borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: Utils.claro),
               ),
               child: child,
             ),

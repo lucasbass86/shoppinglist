@@ -37,10 +37,15 @@ class _HistoryDetailPageState extends State<HistoryDetailPage> {
               TopWidget(showBack: true, title: 'Detalle Compra', showCart: false, showExit: true),
               if (group.isNotEmpty)
                 Expanded(
-                  child: Card(
-                    color: Utils.claro,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                    borderOnForeground: false,
+                  child: Container(
+                    // color: Utils.claro,
+                    // shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    // borderOnForeground: false,
+                    decoration: BoxDecoration(
+                      color: Utils.oscuro.withAlpha(100),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: Utils.claro, width: 2),
+                    ),
                     margin: const EdgeInsets.all(10),
                     child: Padding(
                       padding: const EdgeInsets.all(10),
@@ -49,18 +54,19 @@ class _HistoryDetailPageState extends State<HistoryDetailPage> {
                           _headerDetail(context),
                           const SizedBox(height: 20),
                           _items(),
-                          Divider(color: Utils.oscuro),
+                          Divider(color: Utils.claro),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(Utils.dateEnglishToSpanish(group[0].date.toString()),
-                                  style: mainProvider.itemStyle),
-                              Text('$totalQuantity uds', style: mainProvider.itemStyle),
+                                  style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
+                              Text('$totalQuantity uds',
+                                  style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
                             ],
                           ),
                           const SizedBox(height: 25),
                           Text('Total ${totalPrice.toStringAsFixed(2)}€',
-                              style: mainProvider.titleStyle),
+                              style: mainProvider.titleStyle.copyWith(color: Utils.claro)),
                         ],
                       ),
                     ),
@@ -81,7 +87,7 @@ class _HistoryDetailPageState extends State<HistoryDetailPage> {
           children: [
             Image.asset(Utils.assetShop, width: 30, height: 30),
             const SizedBox(width: 10),
-            Text(group[0].shop.name, style: mainProvider.titleStyle),
+            Text(group[0].shop.name, style: mainProvider.titleStyle.copyWith(color: Utils.claro)),
           ],
         ),
         Row(
@@ -102,7 +108,7 @@ class _HistoryDetailPageState extends State<HistoryDetailPage> {
                     }
                   }
                 },
-                child: Icon(Icons.calendar_month, color: Utils.oscuro, size: 30)),
+                child: Icon(Icons.calendar_month, color: Utils.claro, size: 30)),
             InkWell(
                 splashColor: Utils.medio,
                 borderRadius: BorderRadius.circular(20),
@@ -110,7 +116,7 @@ class _HistoryDetailPageState extends State<HistoryDetailPage> {
                     context: context,
                     message:
                         'Pulsando el icono izquierdo se despliega un menu contextual.\r\nManteniendo pulsada una línea, se puede desplazar para cambiar el orden.\r\nPulsando sobre un producto, se abre su detalle.'),
-                child: Icon(Icons.info_outline_rounded, color: Utils.oscuro, size: 30)),
+                child: Icon(Icons.info_outline_rounded, color: Utils.claro, size: 30)),
           ],
         ),
       ],
@@ -205,7 +211,7 @@ class _HistoryDetailPageState extends State<HistoryDetailPage> {
                 mainProvider.getProductPrice(group[index].product, group[index].shop)) {
               c = Colors.blue[800]!.withAlpha(175);
             } else {
-              c = Utils.oscuro;
+              c = Utils.claro;
             }
             return ZoomIn(
               key: ValueKey(group[index].id),
@@ -241,17 +247,18 @@ class _HistoryDetailPageState extends State<HistoryDetailPage> {
                                         (group[index].product.details.isNotEmpty
                                             ? ' (${group[index].product.details})'
                                             : ''),
-                                    style: mainProvider.itemStyle),
+                                    style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
                               ),
                             ),
                             Row(
                               children: [
-                                Text('${group[index].quantity} x ', style: mainProvider.itemStyle),
+                                Text('${group[index].quantity} x ',
+                                    style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
                                 Text(group[index].price.toStringAsFixed(2),
                                     style: mainProvider.itemStyle.copyWith(color: c)),
                                 Text(
                                     ' = ${(group[index].quantity * group[index].price).toStringAsFixed(2)}€',
-                                    style: mainProvider.itemStyle),
+                                    style: mainProvider.itemStyle.copyWith(color: Utils.claro)),
                               ],
                             ),
                           ],
@@ -290,7 +297,7 @@ class _HistoryDetailPageState extends State<HistoryDetailPage> {
     return PopupMenuButton<EModificationType>(
       color: Utils.oscuro,
       iconSize: 25,
-      icon: Icon(Icons.drag_indicator, color: Utils.oscuro),
+      icon: Icon(Icons.drag_indicator, color: Utils.claro),
       shape: RoundedRectangleBorder(borderRadius: BorderRadiusGeometry.circular(20)),
       onSelected: (order) {
         switch (order) {

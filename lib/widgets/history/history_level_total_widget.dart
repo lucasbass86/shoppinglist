@@ -57,7 +57,7 @@ class HistoryLevelTotalWidget extends StatelessWidget {
                 style: mainProvider.mainTitleStyle.copyWith(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: Utils.oscuro,
+                  color: !isLastTotal ? Utils.claro : Utils.oscuro,
                 ),
               ),
             ],
@@ -68,11 +68,15 @@ class HistoryLevelTotalWidget extends StatelessWidget {
             children: [
               Text(
                 '${uds.toStringAsFixed(0)} uds',
-                style: mainProvider.itemStyle,
+                style: mainProvider.itemStyle.copyWith(
+                  color: !isLastTotal ? Utils.claro : Utils.oscuro,
+                ),
               ),
               Text(
                 '${amount.toStringAsFixed(2)}€',
-                style: mainProvider.itemStyle,
+                style: mainProvider.itemStyle.copyWith(
+                  color: !isLastTotal ? Utils.claro : Utils.oscuro,
+                ),
               ),
             ],
           ),

@@ -1,3 +1,4 @@
+export 'package:shoppinglist/pages/maximize_char_page.dart';
 export 'package:shoppinglist/pages/chart_amount_page.dart';
 export 'package:shoppinglist/pages/forecast_hidden_page.dart';
 export 'package:shoppinglist/pages/forecast_page.dart';
